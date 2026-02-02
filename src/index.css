@@ -1,0 +1,164 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Montserrat:wght@300;400;500&display=swap');
+
+/* Elegant Wedding Invitation Design System */
+
+@layer base {
+  :root {
+    --background: 189 27% 58%;
+    --foreground: 0 0% 100%;
+
+    --card: 189 27% 52%;
+    --card-foreground: 0 0% 100%;
+
+    --popover: 189 27% 52%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 0 0% 100%;
+    --primary-foreground: 189 27% 50%;
+
+    --secondary: 189 20% 70%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 189 20% 45%;
+    --muted-foreground: 0 0% 90%;
+
+    --accent: 40 45% 75%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 100% / 0.3;
+    --input: 0 0% 100% / 0.3;
+    --ring: 0 0% 100%;
+
+    --radius: 0.25rem;
+
+    /* Custom wedding tokens */
+    --sage: 0 0% 100%;
+    --sage-light: 0 0% 100% / 0.5;
+    --blush: 350 35% 85%;
+    --blush-dark: 350 30% 70%;
+    --cream: 45 33% 97%;
+    --cream-dark: 45 25% 90%;
+    --gold: 40 45% 75%;
+    --gold-light: 40 45% 85%;
+
+    --font-display: 'Cormorant Garamond', serif;
+    --font-body: 'Montserrat', sans-serif;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 150 15% 10%;
+    --foreground: 45 33% 95%;
+    --card: 150 15% 12%;
+    --card-foreground: 45 33% 95%;
+    --popover: 150 15% 12%;
+    --popover-foreground: 45 33% 95%;
+    --primary: 150 25% 55%;
+    --primary-foreground: 150 15% 10%;
+    --secondary: 350 25% 25%;
+    --secondary-foreground: 45 33% 95%;
+    --muted: 150 15% 18%;
+    --muted-foreground: 45 20% 65%;
+    --accent: 40 35% 45%;
+    --accent-foreground: 45 33% 95%;
+    --border: 150 15% 20%;
+    --input: 150 15% 20%;
+    --ring: 150 25% 55%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+    font-family: var(--font-body);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+  }
+}
+
+@layer components {
+  .heading-display {
+    font-family: var(--font-display);
+    @apply font-light tracking-wide;
+  }
+
+  .heading-script {
+    font-family: var(--font-display);
+    @apply italic font-light;
+  }
+
+  .text-body {
+    font-family: var(--font-body);
+    @apply font-light tracking-wider uppercase text-sm;
+  }
+
+  .divider-ornament {
+    @apply w-24 h-px bg-gradient-to-r from-transparent via-sage to-transparent mx-auto;
+  }
+
+  .card-elegant {
+    @apply bg-card/80 backdrop-blur-sm border border-sage-light/30 shadow-lg;
+  }
+}
+
+@layer utilities {
+  .bg-sage {
+    background-color: hsl(var(--sage));
+  }
+  .bg-sage-light {
+    background-color: hsl(var(--sage-light));
+  }
+  .bg-blush {
+    background-color: hsl(var(--blush));
+  }
+  .bg-cream {
+    background-color: hsl(var(--cream));
+  }
+  .bg-gold {
+    background-color: hsl(var(--gold));
+  }
+  .text-sage {
+    color: hsl(var(--sage));
+  }
+  .text-blush-dark {
+    color: hsl(var(--blush-dark));
+  }
+  .text-gold {
+    color: hsl(var(--gold));
+  }
+  .border-sage-light {
+    border-color: hsl(var(--sage-light));
+  }
+  .via-sage {
+    --tw-gradient-via: hsl(var(--sage));
+  }
+}
