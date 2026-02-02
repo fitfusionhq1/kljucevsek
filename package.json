@@ -88,5 +88,3 @@
     "vitest": "^3.2.4"
   }
 }
-"predeploy": "vite build",
-"deploy": "gh-pages -d dist"
