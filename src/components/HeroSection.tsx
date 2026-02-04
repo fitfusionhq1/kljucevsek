@@ -6,7 +6,7 @@ import katarinaPhoto from "@/assets/katarina.jpg";
 
 import { Button } from "@/components/ui/button";
 import { MapPin, CheckCircle2 } from "lucide-react";
-import { useGuest } from "@/lib/useGuest"; // če uporabljaš GuestContext, mi povej in prilagodim
+import { useGuest } from "@/lib/useGuest";
 
 function scrollToId(id: string) {
   const el = document.getElementById(id);
@@ -14,7 +14,6 @@ function scrollToId(id: string) {
     el.scrollIntoView({ behavior: "smooth", block: "start" });
     return;
   }
-  // fallback (če je sekcija renderana malo kasneje)
   setTimeout(() => {
     const el2 = document.getElementById(id);
     if (el2) el2.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -28,6 +27,7 @@ const HeroSection = () => {
     ? `${guest.ime}, vesela bova, če se nama pridružiš, da lahko najin dan praznujeva še s tabo!`
     : "Vesela bova, če se nama pridružiš, da lahko najin dan praznujeva še s tabo!";
 
+  // (če želiš brez emoji, zamenjaj na: guest?.ime ? `Živjo, ${guest.ime}` : "Živjo"
   const greeting = guest?.ime ? `Živjo, ${guest.ime} 👋` : "Živjo 👋";
 
   return (
@@ -148,7 +148,7 @@ const HeroSection = () => {
           </p>
         </motion.div>
 
-        {/* ✅ INVITE BAR: personalizacija + CTA (pod datumom) */}
+        {/* ✅ MANJKAJOČI BLOK: personalizacija + CTA */}
         {!loading && (
           <motion.div
             initial={{ opacity: 0, y: 14 }}
