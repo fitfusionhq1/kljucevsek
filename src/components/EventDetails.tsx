@@ -6,11 +6,6 @@ import floralDivider from "@/assets/floral-divider.png";
 const EventDetails = () => {
   const { guest, loading } = useGuest();
 
-  const showCivilna = guest?.civilnaInvited === true;
-  const showOhcet = guest?.ohcetInvited === true;
-
-  // če ni tokena (guest=null), pokažemo vse (javna stran)
-  // če token je, pokažemo samo povabljene dele
   const hasToken = !!guest;
 
   const events = [
@@ -21,7 +16,7 @@ const EventDetails = () => {
       venue: "Grad Rakovnik",
       address: "Rakovniška ulica 6",
       icon: Calendar,
-      visible: hasToken ? showCivilna : true,
+      visible: hasToken && guest?.civilnaInvited === true,
     },
     {
       key: "cerkvena",
@@ -39,7 +34,7 @@ const EventDetails = () => {
       venue: "Gostišče Rupar",
       address: "Škofja Loka",
       icon: Clock,
-      visible: hasToken ? showOhcet : true,
+      visible: hasToken && guest?.ohcetInvited === true,
     },
   ].filter((e) => e.visible);
 
@@ -62,17 +57,24 @@ const EventDetails = () => {
             Podrobnosti
           </h2>
 
-          {/* opcijsko: droben hint med nalaganjem */}
-          {loading ? (
+          {loading && (
             <p className="text-sm text-muted-foreground font-body mt-2">
               Nalagam tvoje vabilo…
             </p>
-          ) : null}
+          )}
 
           <div className="divider-ornament mt-4" />
         </motion.div>
 
-        <div className={`grid gap-6 md:gap-8 ${events.length === 1 ? "md:grid-cols-1" : events.length === 2 ? "md:grid-cols-2" : "md:grid-cols-3"}`}>
+        <div
+          className={`grid gap-6 md:gap-8 ${
+            events.length === 1
+              ? "md:grid-cols-1"
+              : events.length === 2
+              ? "md:grid-cols-2"
+              : "md:grid-cols-3"
+          }`}
+        >
           {events.map((event, index) => (
             <motion.div
               key={event.key}
@@ -88,9 +90,13 @@ const EventDetails = () => {
               <h3 className="heading-display text-2xl md:text-3xl text-foreground mb-4">
                 {event.title}
               </h3>
-              <p className="font-display text-xl text-sage mb-4">{event.time}</p>
+              <p className="font-display text-xl text-sage mb-4">
+                {event.time}
+              </p>
               <div className="space-y-2">
-                <p className="font-display text-lg text-foreground">{event.venue}</p>
+                <p className="font-display text-lg text-foreground">
+                  {event.venue}
+                </p>
                 <div className="flex items-center justify-center gap-2 text-muted-foreground">
                   <MapPin className="w-4 h-4" />
                   <p className="text-sm font-body">{event.address}</p>
