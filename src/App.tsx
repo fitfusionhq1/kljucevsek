@@ -5,10 +5,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import HeroSection from "@/components/HeroSection";
-import GallerySection from "@/components/GallerySection";
-import EventDetails from "@/components/EventDetails";
-import RSVPSection from "@/components/RSVPSection";
 
 const queryClient = new QueryClient();
 
@@ -26,16 +22,5 @@ const App = () => (
     </TooltipProvider>
   </QueryClientProvider>
 );
-
-function App() {
-  return (
-    <>
-      <HeroSection />
-      <GallerySection />
-      <EventDetails />
-      <RSVPSection />
-    </>
-  );
-}
 
 export default App;
