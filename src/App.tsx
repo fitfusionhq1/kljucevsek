@@ -31,7 +31,7 @@ function App() {
   return (
     <>
       <HeroSection />
-      <Gallery />
+      <GallerySection />
       <EventDetails />
       <RSVPSection />
     </>
