@@ -2,14 +2,18 @@ import { motion } from "framer-motion";
 import floralDivider from "@/assets/floral-divider.png";
 
 const images = [
-  "/kljucevsek/gallery/01.jpg",
-  "/kljucevsek/gallery/02.jpg",
-  "/kljucevsek/gallery/03.jpg",
-  "/kljucevsek/gallery/04.jpg",
-  "/kljucevsek/gallery/05.jpg",
-  "/kljucevsek/gallery/06.jpg",
-  // dodaj do 10
+const base = import.meta.env.BASE_URL; // npr "/kljucevsek/"
+const images = [
+  `${base}gallery/01.jpg`,
+  `${base}gallery/02.jpg`,
+  `${base}gallery/03.jpg`,
+  `${base}gallery/04.jpg`,
+  `${base}gallery/05.jpg`,
+  `${base}gallery/06.jpg`,
+  `${base}gallery/07.jpg`,
+  `${base}gallery/10.jpg`,
 ];
+
 
 const GallerySection = () => {
   return (
