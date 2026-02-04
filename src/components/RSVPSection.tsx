@@ -16,7 +16,7 @@ const RSVPSection = () => {
     ime: "",
     priimek: "",
     udelezba: "da", // "da" | "ne"
-    igra: "",
+    igra: "60", // minute (privzeto 60)
     opombe: "",
   });
 
@@ -40,7 +40,7 @@ const RSVPSection = () => {
           ime: formData.ime,
           priimek: formData.priimek,
           udelezba: formData.udelezba,
-          igra: formData.igra,
+          igra: formData.udelezba === "da" ? formData.igra : "", // če ne pride, pustimo prazno
           opombe: formData.opombe,
           source: "github-pages",
         }),
@@ -180,14 +180,19 @@ const RSVPSection = () => {
               className="space-y-2"
             >
               <Label htmlFor="igra" className="text-body">
-                Igra (npr. odgovor / minuta / karkoli ste si zamislili)
+                Koliko časa misliš, da bo trajala cerkvena poroka? (v minutah)
               </Label>
               <Input
                 id="igra"
+                type="number"
+                min="1"
+                max="240"
+                step="1"
+                required
                 value={formData.igra}
                 onChange={(e) => handleChange("igra", e.target.value)}
-                className="bg-background/50 border-sage-light/40 focus:border-sage focus:ring-sage"
-                placeholder="Vpiši..."
+                className="bg-background/50 border-sage-light/40 focus:border-sage focus:ring-sage w-40"
+                placeholder="npr. 60"
               />
             </motion.div>
           )}
