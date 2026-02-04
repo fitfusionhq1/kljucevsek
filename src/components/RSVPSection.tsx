@@ -42,6 +42,9 @@ const RSVPSection = () => {
   const token = useMemo(() => getTokenFromUrl(), []);
   const [guest, setGuest] = useState<Guest | null>(null);
   const [loadingGuest, setLoadingGuest] = useState(true);
+  const message = guest?.ime
+  ? `${guest.ime}, vesela bova, če se nama pridružiš, da lahko najin dan praznujeva še s tabo!`
+  : "Vesela bova, če se nama pridružiš, da lahko najin dan praznujeva še s tabo!";
 
   const [formData, setFormData] = useState({
     udelezba: "da", // "da" | "ne"
@@ -182,12 +185,24 @@ const RSVPSection = () => {
             </p>
           ) : (
             <>
-              <div className="text-center text-sm text-muted-foreground font-body">
-                <div className="mb-1">
-                  <strong>{guest.ime} {guest.priimek}</strong>
-                </div>
-                <div>Povabljen/a si na: <strong>{guest.invitedLabel}</strong></div>
-              </div>
+              <div className="text-center space-y-2">
+  {guest ? (
+    <div className="font-display text-foreground text-lg md:text-xl">
+      {guest.ime} {guest.priimek}
+    </div>
+  ) : null}
+
+  {!loadingGuest && (
+    <motion.p
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="text-base md:text-lg font-body text-foreground/90 max-w-xl mx-auto"
+    >
+      {message}
+    </motion.p>
+  )}
+</div>
 
               <motion.form onSubmit={handleSubmit} className="space-y-8">
                 <div className="space-y-4">
