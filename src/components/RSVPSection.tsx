@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { Heart } from "lucide-react";
 
 const ENDPOINT =
-  "https://script.google.com/macros/s/AKfycbxymiLpPqYbhq8D3XeMHIxBRuqWLwaNs-1e--0xbzHtndFlCLOwRnSR0jmkq0RqYvGY/exec"; // <-- zamenjaj z dejanskim URL
+  "https://script.google.com/macros/s/AKfycbxymiLpPqYbhq8D3XeMHIxBRuqWLwaNs-1e--0xbzHtndFlCLOwRnSR0jmkq0RqYvGY/exec";
 
 type Guest = {
   token: string;
@@ -17,16 +17,13 @@ type Guest = {
   priimek: string;
   civilnaInvited: boolean;
   ohcetInvited: boolean;
-  invitedLabel: string; // "cerkvena + civilna + ohcet"
+  invitedLabel: string;
 };
 
 function getTokenFromUrl(): string {
-  // 1. klasični query (?t=...)
-  const search = window.location.search || "";
-  const t1 = new URLSearchParams(search).get("t");
+  const t1 = new URLSearchParams(window.location.search).get("t");
   if (t1) return t1.trim();
 
-  // 2. query v hash (#rsvp?t=...)
   const hash = window.location.hash || "";
   if (hash.includes("?")) {
     const query = hash.substring(hash.indexOf("?") + 1);
@@ -37,18 +34,18 @@ function getTokenFromUrl(): string {
   return "";
 }
 
-
 const RSVPSection = () => {
   const token = useMemo(() => getTokenFromUrl(), []);
   const [guest, setGuest] = useState<Guest | null>(null);
   const [loadingGuest, setLoadingGuest] = useState(true);
+
   const message = guest?.ime
-  ? `${guest.ime}, vesela bova, če se nama pridružiš, da lahko najin dan praznujeva še s tabo!`
-  : "Vesela bova, če se nama pridružiš, da lahko najin dan praznujeva še s tabo!";
+    ? `${guest.ime}, vesela bova, če se nama pridružiš, da lahko najin dan praznujeva še s tabo!`
+    : "Vesela bova, če se nama pridružiš, da lahko najin dan praznujeva še s tabo!";
 
   const [formData, setFormData] = useState({
-    udelezba: "da", // "da" | "ne"
-    igra: "60", // minute
+    udelezba: "da",
+    igra: "60",
     opombe: "",
   });
 
@@ -59,9 +56,14 @@ const RSVPSection = () => {
     const load = async () => {
       setLoadingGuest(true);
       try {
-        if (!token) throw new Error("Manjka osebna povezava (token).");
+        if (!token) {
+          setGuest(null);
+          return;
+        }
 
-        const res = await fetch(`${ENDPOINT}?op=guest&t=${encodeURIComponent(token)}`);
+        const res = await fetch(
+          `${ENDPOINT}?op=guest&t=${encodeURIComponent(token)}`
+        );
         const data = await res.json();
 
         if (!res.ok || data?.ok !== true) {
@@ -71,7 +73,7 @@ const RSVPSection = () => {
         setGuest(data.guest as Guest);
       } catch (err: any) {
         toast.error("Neveljavna RSVP povezava.", {
-          description: err?.message || "Preveri, da uporabljaš pravi link.",
+          description: err?.message || "Uporabi osebni link iz vabila.",
         });
         setGuest(null);
       } finally {
@@ -106,17 +108,16 @@ const RSVPSection = () => {
       });
 
       const text = await res.text();
-      let parsed: any = null;
-      try { parsed = JSON.parse(text); } catch {}
+      const parsed = JSON.parse(text);
 
-      if (!res.ok || (parsed && parsed.ok === false)) {
+      if (!res.ok || parsed?.ok === false) {
         throw new Error(parsed?.error || `HTTP ${res.status}`);
       }
 
       setIsSubmitted(true);
-      toast.success("Hvala za tvoj odgovor!", { description: "Odgovor je shranjen." });
+      toast.success("Hvala!", { description: "Tvoj odgovor je shranjen." });
     } catch (err: any) {
-      toast.error("Ups, prišlo je do napake.", {
+      toast.error("Prišlo je do napake.", {
         description: err?.message || "Poskusi še enkrat.",
       });
     } finally {
@@ -186,86 +187,72 @@ const RSVPSection = () => {
           ) : (
             <>
               <div className="text-center space-y-2">
-  {guest ? (
-    <div className="font-display text-foreground text-lg md:text-xl">
-      {guest.ime} {guest.priimek}
-    </div>
-  ) : null}
+                <div className="font-display text-foreground text-lg md:text-xl">
+                  {guest.ime} {guest.priimek}
+                </div>
 
-  {!loadingGuest && (
-    <motion.p
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="text-base md:text-lg font-body text-foreground/90 max-w-xl mx-auto"
-    >
-      {message}
-    </motion.p>
-  )}
-</div>
+                <motion.p
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="text-base md:text-lg font-body text-foreground/90 max-w-xl mx-auto"
+                >
+                  {message}
+                </motion.p>
+              </div>
 
               <motion.form onSubmit={handleSubmit} className="space-y-8">
                 <div className="space-y-4">
-                  <Label className="text-body">Ali prideš?</Label>
+                  <Label>Ali prideš?</Label>
                   <RadioGroup
                     value={formData.udelezba}
                     onValueChange={(v) => handleChange("udelezba", v)}
-                    className="flex flex-col md:flex-row gap-4 md:gap-6"
+                    className="flex gap-6"
                   >
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="da" id="da" className="border-sage text-sage" />
-                      <Label htmlFor="da" className="font-body font-light cursor-pointer">
-                        Pridem
-                      </Label>
+                      <RadioGroupItem value="da" id="da" />
+                      <Label htmlFor="da">Pridem</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="ne" id="ne" className="border-sage text-sage" />
-                      <Label htmlFor="ne" className="font-body font-light cursor-pointer">
-                        Ne pridem
-                      </Label>
+                      <RadioGroupItem value="ne" id="ne" />
+                      <Label htmlFor="ne">Ne pridem</Label>
                     </div>
                   </RadioGroup>
                 </div>
 
                 {formData.udelezba === "da" && (
                   <div className="space-y-2">
-                    <Label htmlFor="igra" className="text-body">
-                      Koliko časa misliš, da bo trajala cerkvena poroka? (v minutah)
+                    <Label>
+                      Koliko časa misliš, da bo trajala cerkvena poroka? (v
+                      minutah)
                     </Label>
                     <Input
-                      id="igra"
                       type="number"
                       min="1"
                       max="240"
-                      step="1"
-                      required
                       value={formData.igra}
                       onChange={(e) => handleChange("igra", e.target.value)}
-                      className="bg-background/50 border-sage-light/40 focus:border-sage focus:ring-sage w-40"
-                      placeholder="npr. 60"
+                      required
+                      className="w-40"
                     />
                   </div>
                 )}
 
                 <div className="space-y-2">
-                  <Label htmlFor="opombe" className="text-body">
-                    Opombe (neobvezno)
-                  </Label>
+                  <Label>Opombe (neobvezno)</Label>
                   <Textarea
-                    id="opombe"
                     value={formData.opombe}
                     onChange={(e) => handleChange("opombe", e.target.value)}
-                    className="bg-background/50 border-sage-light/40 focus:border-sage focus:ring-sage min-h-[100px]"
-                    placeholder="Alergije, posebne želje..."
+                    placeholder="Alergije, posebne želje…"
                   />
                 </div>
 
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-sage hover:bg-sage/90 text-primary-foreground font-body tracking-widest uppercase py-6 disabled:opacity-60"
+                  className="w-full py-6 uppercase tracking-widest"
                 >
-                  {isLoading ? "Pošiljam..." : "Pošlji odgovor"}
+                  {isLoading ? "Pošiljam…" : "Pošlji odgovor"}
                 </Button>
               </motion.form>
             </>
