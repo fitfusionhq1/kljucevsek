@@ -23,12 +23,8 @@ function scrollToId(id: string) {
 const HeroSection = () => {
   const { guest, loading } = useGuest();
 
-  const message = guest?.ime
-    ? `${guest.ime}, vesela bova, če se nama pridružiš, da lahko najin dan praznujeva še s tabo!`
-    : "Vesela bova, če se nama pridružiš, da lahko najin dan praznujeva še s tabo!";
-
-  // (če želiš brez emoji, zamenjaj na: guest?.ime ? `Živjo, ${guest.ime}` : "Živjo"
-  const greeting = guest?.ime ? `Živjo, ${guest.ime} 👋` : "Živjo 👋";
+  const greeting = guest?.ime ? `Živjo, ${guest.ime}` : "Živjo";
+  const message = "Za lažjo navigacijo si lahko pomagaš s spodnjimi gumbi.";
 
   return (
     <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
@@ -148,7 +144,7 @@ const HeroSection = () => {
           </p>
         </motion.div>
 
-        {/* ✅ MANJKAJOČI BLOK: personalizacija + CTA */}
+        {/* ✅ Invite bar (brez "Tvoje povabilo vključuje") */}
         {!loading && (
           <motion.div
             initial={{ opacity: 0, y: 14 }}
@@ -156,25 +152,16 @@ const HeroSection = () => {
             transition={{ delay: 1.15, duration: 0.6 }}
             className="mt-10"
           >
-            <div className="card-elegant rounded-sm px-6 py-6 md:px-10 md:py-8 max-w-3xl mx-auto space-y-3">
+            <div className="card-elegant rounded-sm px-6 py-6 md:px-10 md:py-8 max-w-3xl mx-auto space-y-4 text-center">
               <div className="font-display text-foreground text-xl md:text-2xl">
                 {greeting}
               </div>
 
-              <div className="text-base md:text-lg font-body text-foreground/90">
+              <div className="text-base md:text-lg font-body text-foreground/90 max-w-xl mx-auto">
                 {message}
               </div>
 
-              {guest && (
-                <div className="text-sm md:text-base font-body text-muted-foreground">
-                  Tvoje povabilo vključuje:{" "}
-                  <span className="text-foreground/90 font-display">
-                    {guest.invitedLabel}
-                  </span>
-                </div>
-              )}
-
-              <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+              <div className="flex flex-col sm:flex-row gap-3 justify-center pt-1">
                 <Button
                   className="bg-sage hover:bg-sage/90 text-primary-foreground font-body tracking-widest uppercase py-6"
                   onClick={() => scrollToId("rsvp")}
