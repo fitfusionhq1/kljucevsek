@@ -35,7 +35,12 @@ function getTokenFromUrl(): string {
 }
 
 const RSVPSection = () => {
-  const token = useMemo(() => getTokenFromUrl(), []);
+  const [token, setToken] = useState<string>("");
+
+useEffect(() => {
+  setToken(getTokenFromUrl());
+}, []);
+
   const [guest, setGuest] = useState<Guest | null>(null);
   const [loadingGuest, setLoadingGuest] = useState(true);
 
