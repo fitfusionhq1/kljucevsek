@@ -16,7 +16,7 @@ type WishlistItem = {
 type WishlistMap = Record<string, WishlistItem>;
 
 const ENDPOINT =
-  "https://script.google.com/macros/s/AKfycbycbdYrF4hqfhyQp9bs5YEzvsWYbKvPIi2OrGMuL3vjlckUaZk6sE-_ukYvqb4AG8X-/exec";
+  "https://script.google.com/macros/s/AKfycbzcMpYDM-lz_n6w3d54yqN-Wt7v4YDEop7jp-BtPHxVXd_4Nos5MFaVulKtkpoQPoru/exec";
 
 const NAME_STORAGE_KEY = "wishlist-taken-by-name";
 
