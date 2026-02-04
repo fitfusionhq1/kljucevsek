@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { Heart } from "lucide-react";
 
 const ENDPOINT =
-  "https://script.google.com/macros/s/AKfycbztoSoziwbuINadPTo2PN9tNqGz1QI4--WyoDUoAOhtqIHk92mBOYUi6wBQW0VXAVEd/exec"; // <-- zamenjaj z dejanskim URL
+  "https://script.google.com/macros/s/AKfycbxymiLpPqYbhq8D3XeMHIxBRuqWLwaNs-1e--0xbzHtndFlCLOwRnSR0jmkq0RqYvGY/exec"; // <-- zamenjaj z dejanskim URL
 
 type Guest = {
   token: string;
