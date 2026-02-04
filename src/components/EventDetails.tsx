@@ -1,31 +1,47 @@
-import { motion } from 'framer-motion';
-import { MapPin, Clock, Calendar } from 'lucide-react';
-import floralDivider from '@/assets/floral-divider.png';
+import { useGuest } from "@/lib/useGuest";
+import { motion } from "framer-motion";
+import { MapPin, Clock, Calendar } from "lucide-react";
+import floralDivider from "@/assets/floral-divider.png";
 
 const EventDetails = () => {
+  const { guest, loading } = useGuest();
+
+  const showCivilna = guest?.civilnaInvited === true;
+  const showOhcet = guest?.ohcetInvited === true;
+
+  // če ni tokena (guest=null), pokažemo vse (javna stran)
+  // če token je, pokažemo samo povabljene dele
+  const hasToken = !!guest;
+
   const events = [
     {
-      title: 'Civilni obred',
-      time: '12:00',
-      venue: 'Grad Rakovnik',
-      address: 'Rakovniška ulica 6',
+      key: "civilna",
+      title: "Civilni obred",
+      time: "12:00",
+      venue: "Grad Rakovnik",
+      address: "Rakovniška ulica 6",
       icon: Calendar,
+      visible: hasToken ? showCivilna : true,
     },
     {
-      title: 'Cerkvena poroka',
-      time: '14:00',
-      venue: 'Cerkev Marije Pomočnice na Rakovniku',
-      address: 'Rakovniška ulica 6',
+      key: "cerkvena",
+      title: "Cerkvena poroka",
+      time: "14:00",
+      venue: "Cerkev Marije Pomočnice na Rakovniku",
+      address: "Rakovniška ulica 6",
       icon: Calendar,
+      visible: true, // vedno
     },
     {
-      title: 'Ohcet',
-      time: '18:30',
-      venue: 'Gostišče Rupar',
-      address: 'Škofja Loka',
+      key: "ohcet",
+      title: "Ohcet",
+      time: "18:30",
+      venue: "Gostišče Rupar",
+      address: "Škofja Loka",
       icon: Clock,
+      visible: hasToken ? showOhcet : true,
     },
-  ];
+  ].filter((e) => e.visible);
 
   return (
     <section className="py-20 px-6">
@@ -45,13 +61,21 @@ const EventDetails = () => {
           <h2 className="heading-display text-4xl md:text-5xl text-foreground mb-4">
             Podrobnosti
           </h2>
-          <div className="divider-ornament" />
+
+          {/* opcijsko: droben hint med nalaganjem */}
+          {loading ? (
+            <p className="text-sm text-muted-foreground font-body mt-2">
+              Nalagam tvoje vabilo…
+            </p>
+          ) : null}
+
+          <div className="divider-ornament mt-4" />
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-6 md:gap-8">
+        <div className={`grid gap-6 md:gap-8 ${events.length === 1 ? "md:grid-cols-1" : events.length === 2 ? "md:grid-cols-2" : "md:grid-cols-3"}`}>
           {events.map((event, index) => (
             <motion.div
-              key={event.title}
+              key={event.key}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
