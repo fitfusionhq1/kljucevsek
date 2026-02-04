@@ -12,8 +12,8 @@ type WishlistItem = {
   takenBy: string; // tukaj bo anon "guestId"
 };
 
-const ENDPOINT =
-  "https://script.google.com/macros/s/AKfycbzcMpYDM-lz_n6w3d54yqN-Wt7v4YDEop7jp-BtPHxVXd_4Nos5MFaVulKtkpoQPoru/exec";
+const ENDPOINT = "https://script.google.com/macros/s/AKfycbxymiLpPqYbhq8D3XeMHIxBRuqWLwaNs-1e--0xbzHtndFlCLOwRnSR0jmkq0RqYvGY/exec";
+
 
 const GUEST_ID_KEY = "wedding-guest-id";
 
