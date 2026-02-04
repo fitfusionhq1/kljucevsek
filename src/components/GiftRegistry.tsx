@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ExternalLink, Gift } from "lucide-react";
@@ -37,30 +37,13 @@ function ensureName(): string | null {
   return name;
 }
 
-function toArraySorted(wishlist: WishlistMap): WishlistItem[] {
-  const arr = Object.values(wishlist);
-
-  // Poskusimo pametno sortirati:
-  // 1) če so id-ji številke → po številki
-  // 2) sicer po id kot string
-  const allNumeric = arr.every((x) => /^\d+$/.test(x.id));
-  if (allNumeric) {
-    arr.sort((a, b) => Number(a.id) - Number(b.id));
-  } else {
-    arr.sort((a, b) => a.id.localeCompare(b.id, "sl"));
-  }
-
-  return arr;
-}
-
 const GiftRegistry = () => {
-  const [wishlist, setWishlist] = useState<WishlistMap>({});
+  const [items, setItems] = useState<WishlistItem[]>([]);
+  const [wishlistMap, setWishlistMap] = useState<WishlistMap>({});
   const [isLoading, setIsLoading] = useState(true);
 
-  const items = useMemo(() => toArraySorted(wishlist), [wishlist]);
-
-  const loadWishlist = async () => {
-    setIsLoading(true);
+  const loadWishlist = async (silent = false) => {
+    if (!silent) setIsLoading(true);
     try {
       const res = await fetch(`${ENDPOINT}?op=wishlist`);
       const data = await res.json();
@@ -69,21 +52,21 @@ const GiftRegistry = () => {
         throw new Error(data?.error || `HTTP ${res.status}`);
       }
 
-      setWishlist(data.wishlist || {});
+      setWishlistMap(data.wishlist || {});
+      setItems(data.wishlistOrdered || []);
     } catch (err: any) {
       toast.error("Ne morem prebrati seznama daril.", {
         description: err?.message || "Poskusi osvežiti stran.",
       });
     } finally {
-      setIsLoading(false);
+      if (!silent) setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    loadWishlist();
-
-    // Auto-refresh (da drugi hitro vidijo spremembe)
-    const t = setInterval(loadWishlist, 20000);
+    loadWishlist(false);
+    // Auto-refresh, da vsi hitro vidijo spremembe
+    const t = setInterval(() => loadWishlist(true), 20000);
     return () => clearInterval(t);
   }, []);
 
@@ -91,9 +74,9 @@ const GiftRegistry = () => {
     const myName = ensureName();
     if (!myName) return;
 
-    const current = wishlist[id];
+    const current = wishlistMap[id];
 
-    // Če je že izbrano in ni moje ime → zaklenjeno
+    // Če je že izbrano in ni moje ime -> zaklenjeno
     if (current?.taken && current?.takenBy && current.takenBy !== myName) {
       toast.error("To darilo je že izbral nekdo drug.", {
         description: `Izbral: ${current.takenBy}`,
@@ -101,11 +84,23 @@ const GiftRegistry = () => {
       return;
     }
 
-    // Optimistic update (da UI takoj reagira)
-    setWishlist((prev) => ({
+    // Optimistic UI: takoj prečrta/odprečrta
+    setItems((prev) =>
+      prev.map((x) =>
+        x.id === id
+          ? {
+              ...x,
+              taken: nextTaken,
+              takenBy: nextTaken ? myName : "",
+              takenAt: nextTaken ? new Date().toISOString() : "",
+            }
+          : x
+      )
+    );
+    setWishlistMap((prev) => ({
       ...prev,
       [id]: {
-        ...(prev[id] || { id, name: "", url: "", takenAt: "", takenBy: "" }),
+        ...(prev[id] || { id, name: "", url: "", takenAt: "", takenBy: "", taken: false }),
         taken: nextTaken,
         takenBy: nextTaken ? myName : "",
         takenAt: nextTaken ? new Date().toISOString() : "",
@@ -134,10 +129,10 @@ const GiftRegistry = () => {
         throw new Error(parsed?.error || `HTTP ${res.status}`);
       }
 
-      await loadWishlist();
+      await loadWishlist(true);
       toast.success(nextTaken ? "Darilo označeno!" : "Oznaka odstranjena.");
     } catch (err: any) {
-      await loadWishlist();
+      await loadWishlist(false);
       toast.error("Ni uspelo shraniti izbire.", {
         description: err?.message || "Poskusi še enkrat.",
       });
@@ -161,8 +156,8 @@ const GiftRegistry = () => {
             Seznam daril
           </h2>
           <p className="text-body text-muted-foreground max-w-xl mx-auto">
-            Darila se nalagajo iz skupnega Google Sheets seznama. Ko je darilo
-            izbrano, ostane prečrtano, da ga drugi ne izberejo.
+            Darila se nalagajo iz skupnega seznama. Ko je darilo izbrano, ostane
+            prečrtano, da ga drugi ne izberejo.
           </p>
           <div className="divider-ornament mt-6" />
         </motion.div>
@@ -185,12 +180,11 @@ const GiftRegistry = () => {
           ) : (
             <ul className="space-y-4">
               {items.map((item, index) => {
-                const isTaken = item.taken;
-                const takenBy = item.takenBy;
+                const isTaken = !!item.taken;
+                const takenBy = item.takenBy || "";
 
                 const myName = getStoredName();
-                const canUncheck =
-                  isTaken && takenBy && myName && takenBy === myName;
+                const canUncheck = isTaken && takenBy && myName && takenBy === myName;
 
                 return (
                   <motion.li
