@@ -1,36 +1,23 @@
 import { motion } from "framer-motion";
-import floralDivider from "@/assets/floral-divider.png";
-
-const images = [
-const base = import.meta.env.BASE_URL; // npr "/kljucevsek/"
-const images = [
-  `${base}gallery/01.jpg`,
-  `${base}gallery/02.jpg`,
-  `${base}gallery/03.jpg`,
-  `${base}gallery/04.jpg`,
-  `${base}gallery/05.jpg`,
-  `${base}gallery/06.jpg`,
-  `${base}gallery/07.jpg`,
-  `${base}gallery/10.jpg`,
-];
-
 
 const GallerySection = () => {
+  const base = import.meta.env.BASE_URL; // npr. "/kljucevsek/"
+
+  const images = [
+    `${base}gallery/01.jpg`,
+    `${base}gallery/02.jpg`,
+    `${base}gallery/03.jpg`,
+    `${base}gallery/04.jpg`,
+    `${base}gallery/05.jpg`,
+    `${base}gallery/06.jpg`,
+    `${base}gallery/07.jpg`,
+    `${base}gallery/10.jpg`,
+  ];
+
   return (
     <section className="py-20 px-6" id="gallery">
-      <div className="max-w-6xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-12"
-        >
-          <img
-            src={floralDivider}
-            alt="Divider"
-            className="w-48 md:w-64 mx-auto mb-8 opacity-80"
-          />
+      <div className="max-w-5xl mx-auto">
+        <div className="text-center mb-12">
           <h2 className="heading-display text-4xl md:text-5xl text-foreground mb-4">
             Utrinki
           </h2>
@@ -38,7 +25,7 @@ const GallerySection = () => {
             Nekaj najinih najljubših trenutkov.
           </p>
           <div className="divider-ornament mt-6" />
-        </motion.div>
+        </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
           {images.map((src, i) => (
@@ -48,7 +35,7 @@ const GallerySection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.04 }}
-              className="card-elegant overflow-hidden rounded-sm"
+              className="overflow-hidden rounded-sm card-elegant"
             >
               <img
                 src={src}
