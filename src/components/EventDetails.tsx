@@ -8,6 +8,10 @@ const EventDetails = () => {
 
   const hasToken = !!guest;
 
+  const message = guest?.ime
+    ? `${guest.ime}, vesela bova, če se nama pridružiš, da lahko najin dan praznujeva še s tabo!`
+    : "Vesela bova, če se nama pridružiš, da lahko najin dan praznujeva še s tabo!";
+
   const events = [
     {
       key: "civilna",
@@ -53,17 +57,23 @@ const EventDetails = () => {
             alt="Floral divider"
             className="w-48 md:w-64 mx-auto mb-8 opacity-80"
           />
-          <h2 className="heading-display text-4xl md:text-5xl text-foreground mb-4">
+
+          <h2 className="heading-display text-4xl md:text-5xl text-foreground mb-2">
             Podrobnosti
           </h2>
 
-          {loading && (
-            <p className="text-sm text-muted-foreground font-body mt-2">
-              Nalagam tvoje vabilo…
-            </p>
+          {!loading && (
+            <motion.p
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="text-base md:text-lg font-body text-foreground/90 max-w-2xl mx-auto"
+            >
+              {message}
+            </motion.p>
           )}
 
-          <div className="divider-ornament mt-4" />
+          <div className="divider-ornament mt-6" />
         </motion.div>
 
         <div
@@ -87,12 +97,15 @@ const EventDetails = () => {
               <div className="w-12 h-12 mx-auto mb-6 flex items-center justify-center bg-sage/10 rounded-full">
                 <event.icon className="w-6 h-6 text-sage" />
               </div>
+
               <h3 className="heading-display text-2xl md:text-3xl text-foreground mb-4">
                 {event.title}
               </h3>
+
               <p className="font-display text-xl text-sage mb-4">
                 {event.time}
               </p>
+
               <div className="space-y-2">
                 <p className="font-display text-lg text-foreground">
                   {event.venue}

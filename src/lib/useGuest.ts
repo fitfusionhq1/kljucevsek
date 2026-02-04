@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 const ENDPOINT =
-  "https://script.google.com/macros/s/AKfycbxymiLpPqYbhq8D3XeMHIxBRuqWLwaNs-1e--0xbzHtndFlCLOwRnSR0jmkq0RqYvGY/exec"; // isti kot RSVP/Gifts
+  "https://script.google.com/macros/s/AKfycbxymiLpPqYbhq8D3XeMHIxBRuqWLwaNs-1e--0xbzHtndFlCLOwRnSR0jmkq0RqYvGY/exec"; // ⬅️ NUJNO zamenjaj
 
 export type Guest = {
   token: string;
@@ -13,9 +13,11 @@ export type Guest = {
 };
 
 function getTokenFromUrl(): string {
+  // ?t=...
   const t1 = new URLSearchParams(window.location.search).get("t");
   if (t1) return t1.trim();
 
+  // #rsvp?t=...
   const hash = window.location.hash || "";
   const qIndex = hash.indexOf("?");
   if (qIndex >= 0) {
@@ -40,11 +42,19 @@ export function useGuest() {
           setGuest(null);
           return;
         }
-        const res = await fetch(`${ENDPOINT}?op=guest&t=${encodeURIComponent(token)}`);
+
+        const res = await fetch(
+          `${ENDPOINT}?op=guest&t=${encodeURIComponent(token)}`
+        );
         const data = await res.json();
-        if (!res.ok || data?.ok !== true) throw new Error(data?.error || `HTTP ${res.status}`);
+
+        if (!res.ok || data?.ok !== true) {
+          throw new Error(data?.error || "Guest lookup failed");
+        }
+
         setGuest(data.guest as Guest);
-      } catch {
+      } catch (err) {
+        console.error("useGuest error:", err);
         setGuest(null);
       } finally {
         setLoading(false);
