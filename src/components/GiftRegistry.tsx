@@ -9,38 +9,32 @@ type WishlistItem = {
   name: string;
   url: string;
   taken: boolean;
-  takenBy: string;
-  takenAt: string;
+  takenBy: string; // tukaj bo anon "guestId"
 };
-
-type WishlistMap = Record<string, WishlistItem>;
 
 const ENDPOINT =
   "https://script.google.com/macros/s/AKfycbzcMpYDM-lz_n6w3d54yqN-Wt7v4YDEop7jp-BtPHxVXd_4Nos5MFaVulKtkpoQPoru/exec";
 
-const NAME_STORAGE_KEY = "wishlist-taken-by-name";
+const GUEST_ID_KEY = "wedding-guest-id";
 
-function getStoredName() {
-  return (localStorage.getItem(NAME_STORAGE_KEY) || "").trim();
-}
-
-function ensureName(): string | null {
-  const existing = getStoredName();
+function getOrCreateGuestId(): string {
+  const existing = localStorage.getItem(GUEST_ID_KEY);
   if (existing) return existing;
 
-  const name = window
-    .prompt("Vpiši svoje ime (da se zabeleži izbira darila):", "")
-    ?.trim();
+  // enostaven anon id (dovolj za ta namen)
+  const id =
+    (crypto?.randomUUID?.() ||
+      `gid_${Math.random().toString(16).slice(2)}_${Date.now()}`);
 
-  if (!name) return null;
-  localStorage.setItem(NAME_STORAGE_KEY, name);
-  return name;
+  localStorage.setItem(GUEST_ID_KEY, id);
+  return id;
 }
 
 const GiftRegistry = () => {
   const [items, setItems] = useState<WishlistItem[]>([]);
-  const [wishlistMap, setWishlistMap] = useState<WishlistMap>({});
   const [isLoading, setIsLoading] = useState(true);
+
+  const guestId = getOrCreateGuestId();
 
   const loadWishlist = async (silent = false) => {
     if (!silent) setIsLoading(true);
@@ -52,8 +46,15 @@ const GiftRegistry = () => {
         throw new Error(data?.error || `HTTP ${res.status}`);
       }
 
-      setWishlistMap(data.wishlist || {});
-      setItems(data.wishlistOrdered || []);
+      setItems(
+        (data.wishlistOrdered || []).map((x: any) => ({
+          id: String(x.id),
+          name: String(x.name || ""),
+          url: String(x.url || ""),
+          taken: !!x.taken,
+          takenBy: String(x.takenBy || ""),
+        }))
+      );
     } catch (err: any) {
       toast.error("Ne morem prebrati seznama daril.", {
         description: err?.message || "Poskusi osvežiti stran.",
@@ -65,47 +66,19 @@ const GiftRegistry = () => {
 
   useEffect(() => {
     loadWishlist(false);
-    // Auto-refresh, da vsi hitro vidijo spremembe
     const t = setInterval(() => loadWishlist(true), 20000);
     return () => clearInterval(t);
   }, []);
 
-  const toggleGift = async (id: string, nextTaken: boolean) => {
-    const myName = ensureName();
-    if (!myName) return;
-
-    const current = wishlistMap[id];
-
-    // Če je že izbrano in ni moje ime -> zaklenjeno
-    if (current?.taken && current?.takenBy && current.takenBy !== myName) {
-      toast.error("To darilo je že izbral nekdo drug.", {
-        description: `Izbral: ${current.takenBy}`,
-      });
-      return;
-    }
-
-    // Optimistic UI: takoj prečrta/odprečrta
+  const setGiftTaken = async (id: string, nextTaken: boolean) => {
+    // optimistic update
     setItems((prev) =>
       prev.map((x) =>
         x.id === id
-          ? {
-              ...x,
-              taken: nextTaken,
-              takenBy: nextTaken ? myName : "",
-              takenAt: nextTaken ? new Date().toISOString() : "",
-            }
+          ? { ...x, taken: nextTaken, takenBy: nextTaken ? guestId : "" }
           : x
       )
     );
-    setWishlistMap((prev) => ({
-      ...prev,
-      [id]: {
-        ...(prev[id] || { id, name: "", url: "", takenAt: "", takenBy: "", taken: false }),
-        taken: nextTaken,
-        takenBy: nextTaken ? myName : "",
-        takenAt: nextTaken ? new Date().toISOString() : "",
-      },
-    }));
 
     try {
       const res = await fetch(ENDPOINT, {
@@ -115,7 +88,7 @@ const GiftRegistry = () => {
           op: "toggle",
           id,
           taken: nextTaken,
-          takenBy: myName,
+          takenBy: nextTaken ? guestId : "", // če odznačiš, sprazni
         }),
       });
 
@@ -130,11 +103,11 @@ const GiftRegistry = () => {
       }
 
       await loadWishlist(true);
-      toast.success(nextTaken ? "Darilo označeno!" : "Oznaka odstranjena.");
+      toast.success(nextTaken ? "Darilo označeno." : "Darilo odznačeno.");
     } catch (err: any) {
       await loadWishlist(false);
-      toast.error("Ni uspelo shraniti izbire.", {
-        description: err?.message || "Poskusi še enkrat.",
+      toast.error("Ni uspelo shraniti spremembe.", {
+        description: err?.message || "Poskusi znova.",
       });
     }
   };
@@ -152,12 +125,12 @@ const GiftRegistry = () => {
           <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center bg-sage/10 rounded-full">
             <Gift className="w-8 h-8 text-sage" />
           </div>
-          <h2 className="heading-display text-4xl md:text-5xl text-foreground mb-4">
+          <h2 className="heading-display text-4xl md:text-5xl mb-4">
             Seznam daril
           </h2>
           <p className="text-body text-muted-foreground max-w-xl mx-auto">
-            Darila se nalagajo iz skupnega seznama. Ko je darilo izbrano, ostane
-            prečrtano, da ga drugi ne izberejo.
+            Ko izbereš darilo, se prečrta. Odznačiti ga lahko samo ista naprava,
+            ki ga je označila.
           </p>
           <div className="divider-ornament mt-6" />
         </motion.div>
@@ -170,21 +143,18 @@ const GiftRegistry = () => {
           className="card-elegant p-6 md:p-8 rounded-sm"
         >
           {isLoading ? (
-            <p className="text-center text-sm text-muted-foreground font-body">
+            <p className="text-center text-sm text-muted-foreground">
               Nalagam seznam daril…
             </p>
           ) : items.length === 0 ? (
-            <p className="text-center text-sm text-muted-foreground font-body">
+            <p className="text-center text-sm text-muted-foreground">
               Trenutno ni daril v seznamu (preveri tab WISHLIST v Sheets).
             </p>
           ) : (
             <ul className="space-y-4">
               {items.map((item, index) => {
-                const isTaken = !!item.taken;
-                const takenBy = item.takenBy || "";
-
-                const myName = getStoredName();
-                const canUncheck = isTaken && takenBy && myName && takenBy === myName;
+                const isMine = item.taken && item.takenBy === guestId;
+                const locked = item.taken && !isMine;
 
                 return (
                   <motion.li
@@ -194,43 +164,47 @@ const GiftRegistry = () => {
                     viewport={{ once: true }}
                     transition={{ duration: 0.4, delay: index * 0.04 }}
                     className={`flex items-center gap-4 p-4 rounded-sm border transition-all ${
-                      isTaken
+                      item.taken
                         ? "bg-muted/50 border-sage/20"
                         : "bg-background/50 border-sage-light/40 hover:border-sage/40"
                     }`}
                   >
                     <Checkbox
-                      id={`gift-${item.id}`}
-                      checked={isTaken}
-                      disabled={isTaken && !canUncheck}
-                      onCheckedChange={(v) => toggleGift(item.id, !!v)}
+                      checked={item.taken}
+                      disabled={locked}
+                      onCheckedChange={(v) => setGiftTaken(item.id, !!v)}
                       className="border-sage data-[state=checked]:bg-sage data-[state=checked]:border-sage"
                     />
 
-                    <label
-                      htmlFor={`gift-${item.id}`}
-                      className={`flex-1 font-body cursor-pointer transition-all ${
-                        isTaken
-                          ? "line-through text-muted-foreground/60"
-                          : "text-foreground"
+                    <span
+                      className={`flex-1 font-body ${
+                        item.taken ? "line-through text-muted-foreground/60" : ""
                       }`}
-                      title={isTaken && takenBy ? `Izbral: ${takenBy}` : undefined}
+                      title={
+                        locked
+                          ? "Darilo je že izbrano."
+                          : item.taken
+                          ? "Klikni za odznačiti."
+                          : "Klikni za označiti."
+                      }
                     >
                       {item.name}
-                      {isTaken && takenBy ? (
+                      {isMine ? (
                         <span className="ml-2 text-xs text-muted-foreground/70">
-                          (izbral: {takenBy})
+                          (tvoja izbira)
                         </span>
                       ) : null}
-                    </label>
+                    </span>
 
                     {item.url ? (
                       <a
                         href={item.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`flex items-center gap-1 text-sm font-body transition-colors ${
-                          isTaken ? "text-muted-foreground/40" : "text-sage hover:text-sage/80"
+                        className={`flex items-center gap-1 text-sm ${
+                          item.taken
+                            ? "text-muted-foreground/40"
+                            : "text-sage hover:text-sage/80"
                         }`}
                       >
                         <ExternalLink className="w-4 h-4" />
@@ -243,16 +217,6 @@ const GiftRegistry = () => {
             </ul>
           )}
         </motion.div>
-
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="text-center text-sm text-muted-foreground/70 mt-6 font-body"
-        >
-          * Seznam se osveži avtomatsko (vsakih ~20 s).
-        </motion.p>
       </div>
     </section>
   );
