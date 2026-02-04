@@ -21,20 +21,22 @@ type Guest = {
 };
 
 function getTokenFromUrl(): string {
-  // podpira ?t=... (pred #) in tudi #...t=... (če bi kdaj rabil)
-  const p1 = new URLSearchParams(window.location.search);
-  const t1 = (p1.get("t") || "").trim();
-  if (t1) return t1;
+  // 1. klasični query (?t=...)
+  const search = window.location.search || "";
+  const t1 = new URLSearchParams(search).get("t");
+  if (t1) return t1.trim();
 
+  // 2. query v hash (#rsvp?t=...)
   const hash = window.location.hash || "";
-  const idx = hash.indexOf("t=");
-  if (idx >= 0) {
-    const part = hash.slice(idx);
-    const p2 = new URLSearchParams(part.replace(/^.*\?/, ""));
-    return (p2.get("t") || "").trim();
+  if (hash.includes("?")) {
+    const query = hash.substring(hash.indexOf("?") + 1);
+    const t2 = new URLSearchParams(query).get("t");
+    if (t2) return t2.trim();
   }
+
   return "";
 }
+
 
 const RSVPSection = () => {
   const token = useMemo(() => getTokenFromUrl(), []);
