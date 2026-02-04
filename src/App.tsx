@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import HeroSection from "@/components/HeroSection";
-import Gallery from "@/components/Gallery";
+import GallerySection from "@/components/GallerySection";
 import EventDetails from "@/components/EventDetails";
 import RSVPSection from "@/components/RSVPSection";
 
