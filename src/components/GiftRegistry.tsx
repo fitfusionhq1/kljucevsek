@@ -4,73 +4,21 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ExternalLink, Gift } from "lucide-react";
 import { toast } from "sonner";
 
-interface GiftItem {
+type WishlistItem = {
   id: string;
   name: string;
-  link?: string;
-}
+  url: string;
+  taken: boolean;
+  takenBy: string;
+  takenAt: string;
+};
 
-type WishlistMap = Record<
-  string,
-  {
-    id: string;
-    name: string;
-    url: string;
-    taken: boolean;
-    takenBy: string;
-    takenAt: string;
-  }
->;
+type WishlistMap = Record<string, WishlistItem>;
 
-// Tvoj Apps Script endpoint:
 const ENDPOINT =
   "https://script.google.com/macros/s/AKfycbycbdYrF4hqfhyQp9bs5YEzvsWYbKvPIi2OrGMuL3vjlckUaZk6sE-_ukYvqb4AG8X-/exec";
 
 const NAME_STORAGE_KEY = "wishlist-taken-by-name";
-
-// Če želiš, lahko pustiš hardcoded seznam (kot zdaj).
-// Status (taken) bomo brali iz Sheets in prečrtali po Sheets stanju.
-const giftItems: GiftItem[] = [
-  { id: "1", name: "Wok ponev" },
-  { id: "2", name: "Ponev za palačinke" },
-  {
-    id: "3",
-    name: "Kontaktni žar",
-    link: "https://www.mimovrste.com/kontaktni-kuhinjski-zari/gorenje-kr-1800-sdp-kontaktni-zar",
-  },
-  { id: "4", name: "Likalna deska" },
-  { id: "5", name: "Sesalec" },
-  {
-    id: "6",
-    name: "Odcejevalna podloga",
-    link: "https://www.ikea.com/si/sl/p/nyskoeljd-odcejalna-podloga-temno-siva-00451059/",
-  },
-  {
-    id: "7",
-    name: "Kopalniške brisače 50x100 cm - peščeno rjava barva 4x",
-    link: "https://www.svilanit.si/brisace/brisaca-svilanit-purity-pesceno-rjava.html",
-  },
-  {
-    id: "8",
-    name: "Kopalniške brisače 65x140 cm - peščeno rjava barva 2x",
-    link: "https://www.svilanit.si/brisace/brisaca-svilanit-purity-pesceno-rjava.html",
-  },
-  {
-    id: "9",
-    name: "Kopalniške brisače 50x100 cm - bela barva 4x",
-    link: "https://www.svilanit.si/brisace/brisaca-svilanit-purity-bela.html",
-  },
-  {
-    id: "10",
-    name: "Kopalniške brisače 65x140 cm - bela barva 2x",
-    link: "https://www.svilanit.si/brisace/brisaca-svilanit-purity-bela.html",
-  },
-  { id: "11", name: "Grelec za vodo" },
-  { id: "12", name: "Ročni mešalnik" },
-  { id: "13", name: "Palični mešalnik" },
-  { id: "14", name: "Set nožev" },
-  { id: "15", name: "Sobno kolo" },
-];
 
 function getStoredName() {
   return (localStorage.getItem(NAME_STORAGE_KEY) || "").trim();
@@ -89,21 +37,27 @@ function ensureName(): string | null {
   return name;
 }
 
+function toArraySorted(wishlist: WishlistMap): WishlistItem[] {
+  const arr = Object.values(wishlist);
+
+  // Poskusimo pametno sortirati:
+  // 1) če so id-ji številke → po številki
+  // 2) sicer po id kot string
+  const allNumeric = arr.every((x) => /^\d+$/.test(x.id));
+  if (allNumeric) {
+    arr.sort((a, b) => Number(a.id) - Number(b.id));
+  } else {
+    arr.sort((a, b) => a.id.localeCompare(b.id, "sl"));
+  }
+
+  return arr;
+}
+
 const GiftRegistry = () => {
   const [wishlist, setWishlist] = useState<WishlistMap>({});
   const [isLoading, setIsLoading] = useState(true);
 
-  const mergedItems = useMemo(() => {
-    // status vzamemo iz Sheets (wishlist), besedilo/link pa iz giftItems
-    return giftItems.map((g) => {
-      const w = wishlist[g.id];
-      return {
-        ...g,
-        taken: !!w?.taken,
-        takenBy: w?.takenBy || "",
-      };
-    });
-  }, [wishlist]);
+  const items = useMemo(() => toArraySorted(wishlist), [wishlist]);
 
   const loadWishlist = async () => {
     setIsLoading(true);
@@ -127,18 +81,19 @@ const GiftRegistry = () => {
 
   useEffect(() => {
     loadWishlist();
-    // optional: osvežitev vsakih 20s, da drugi takoj vidijo spremembe
+
+    // Auto-refresh (da drugi hitro vidijo spremembe)
     const t = setInterval(loadWishlist, 20000);
     return () => clearInterval(t);
   }, []);
 
   const toggleGift = async (id: string, nextTaken: boolean) => {
-    // če nekdo želi rezervirati darilo:
     const myName = ensureName();
     if (!myName) return;
 
-    // če je že taken in ni moje ime -> ne dovolimo
     const current = wishlist[id];
+
+    // Če je že izbrano in ni moje ime → zaklenjeno
     if (current?.taken && current?.takenBy && current.takenBy !== myName) {
       toast.error("To darilo je že izbral nekdo drug.", {
         description: `Izbral: ${current.takenBy}`,
@@ -146,13 +101,11 @@ const GiftRegistry = () => {
       return;
     }
 
-    // optimistic update
+    // Optimistic update (da UI takoj reagira)
     setWishlist((prev) => ({
       ...prev,
       [id]: {
-        id,
-        name: prev[id]?.name || "",
-        url: prev[id]?.url || "",
+        ...(prev[id] || { id, name: "", url: "", takenAt: "", takenBy: "" }),
         taken: nextTaken,
         takenBy: nextTaken ? myName : "",
         takenAt: nextTaken ? new Date().toISOString() : "",
@@ -181,12 +134,9 @@ const GiftRegistry = () => {
         throw new Error(parsed?.error || `HTTP ${res.status}`);
       }
 
-      // refresh iz Sheets (da je 100% sinhrono)
       await loadWishlist();
-
       toast.success(nextTaken ? "Darilo označeno!" : "Oznaka odstranjena.");
     } catch (err: any) {
-      // rollback
       await loadWishlist();
       toast.error("Ni uspelo shraniti izbire.", {
         description: err?.message || "Poskusi še enkrat.",
@@ -211,8 +161,8 @@ const GiftRegistry = () => {
             Seznam daril
           </h2>
           <p className="text-body text-muted-foreground max-w-xl mx-auto">
-            Označi darilo s kljukico. Ko je darilo izbrano, ostane prečrtano, da
-            ga drugi ne izberejo.
+            Darila se nalagajo iz skupnega Google Sheets seznama. Ko je darilo
+            izbrano, ostane prečrtano, da ga drugi ne izberejo.
           </p>
           <div className="divider-ornament mt-6" />
         </motion.div>
@@ -228,13 +178,19 @@ const GiftRegistry = () => {
             <p className="text-center text-sm text-muted-foreground font-body">
               Nalagam seznam daril…
             </p>
+          ) : items.length === 0 ? (
+            <p className="text-center text-sm text-muted-foreground font-body">
+              Trenutno ni daril v seznamu (preveri tab WISHLIST v Sheets).
+            </p>
           ) : (
             <ul className="space-y-4">
-              {mergedItems.map((item, index) => {
+              {items.map((item, index) => {
                 const isTaken = item.taken;
                 const takenBy = item.takenBy;
+
                 const myName = getStoredName();
-                const canUncheck = isTaken && takenBy && myName && takenBy === myName;
+                const canUncheck =
+                  isTaken && takenBy && myName && takenBy === myName;
 
                 return (
                   <motion.li
@@ -242,7 +198,7 @@ const GiftRegistry = () => {
                     initial={{ opacity: 0, x: -20 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.4, delay: index * 0.05 }}
+                    transition={{ duration: 0.4, delay: index * 0.04 }}
                     className={`flex items-center gap-4 p-4 rounded-sm border transition-all ${
                       isTaken
                         ? "bg-muted/50 border-sage/20"
@@ -252,7 +208,6 @@ const GiftRegistry = () => {
                     <Checkbox
                       id={`gift-${item.id}`}
                       checked={isTaken}
-                      // če je taken in ni moja rezervacija -> zaklenjeno
                       disabled={isTaken && !canUncheck}
                       onCheckedChange={(v) => toggleGift(item.id, !!v)}
                       className="border-sage data-[state=checked]:bg-sage data-[state=checked]:border-sage"
@@ -261,7 +216,9 @@ const GiftRegistry = () => {
                     <label
                       htmlFor={`gift-${item.id}`}
                       className={`flex-1 font-body cursor-pointer transition-all ${
-                        isTaken ? "line-through text-muted-foreground/60" : "text-foreground"
+                        isTaken
+                          ? "line-through text-muted-foreground/60"
+                          : "text-foreground"
                       }`}
                       title={isTaken && takenBy ? `Izbral: ${takenBy}` : undefined}
                     >
@@ -273,9 +230,9 @@ const GiftRegistry = () => {
                       ) : null}
                     </label>
 
-                    {item.link && (
+                    {item.url ? (
                       <a
-                        href={item.link}
+                        href={item.url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className={`flex items-center gap-1 text-sm font-body transition-colors ${
@@ -285,7 +242,7 @@ const GiftRegistry = () => {
                         <ExternalLink className="w-4 h-4" />
                         <span className="hidden sm:inline">Povezava</span>
                       </a>
-                    )}
+                    ) : null}
                   </motion.li>
                 );
               })}
@@ -300,7 +257,7 @@ const GiftRegistry = () => {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="text-center text-sm text-muted-foreground/70 mt-6 font-body"
         >
-          * Izbire se shranjujejo v skupni seznam (Google Sheets).
+          * Seznam se osveži avtomatsko (vsakih ~20 s).
         </motion.p>
       </div>
     </section>
