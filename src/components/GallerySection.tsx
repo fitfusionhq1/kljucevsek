@@ -1,3 +1,5 @@
+
+<div className="text-white text-center">GALERIJA SE RENDERA ✅</div>
 import { motion } from "framer-motion";
 
 const GallerySection = () => {
