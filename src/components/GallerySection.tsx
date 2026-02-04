@@ -14,6 +14,7 @@ const GallerySection = () => {
     `${base}gallery/10.jpg`,
   ];
 
+
   return (
     <section className="py-20 px-6" id="gallery">
       <div className="max-w-5xl mx-auto">
