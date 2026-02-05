@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Heart } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
 
 const ENDPOINT =
   "https://script.google.com/macros/s/AKfycbz7liXEZYv9k-bjZc_58zYhxSBaow8dVqIOGqK8gbS78orMrOBSchRHI59mFiTioMa9/exec";
@@ -52,7 +51,7 @@ function normalizeGuest(g: Guest): GuestNormalized {
   const maxGuests = Math.max(1, Number(g.maxGuests ?? 1) || 1);
   const likelyGuests = Math.min(
     maxGuests,
-    Math.max(1, Number(g.likelyGuests ?? maxGuests) || maxGuests),
+    Math.max(1, Number(g.likelyGuests ?? maxGuests) || maxGuests)
   );
 
   // backwards compatible defaults
@@ -101,9 +100,6 @@ const RSVPSection = () => {
   const [formData, setFormData] = useState({
     udelezba: "da",
     stOseb: "1",
-    cerkvena: true,
-    civilna: true,
-    ohcet: true,
     igra: "60",
     opombe: "",
   });
@@ -113,9 +109,6 @@ const RSVPSection = () => {
     setFormData((prev) => ({
       ...prev,
       stOseb: String(guest.likelyGuests),
-      cerkvena: guest.invites.cerkvena,
-      civilna: guest.invites.civilna,
-      ohcet: guest.invites.ohcet,
     }));
   }, [guest]);
 
@@ -162,15 +155,17 @@ const RSVPSection = () => {
     e.preventDefault();
     if (!guest) return;
 
+    const coming = formData.udelezba === "da";
+
     const stOsebNum = Math.max(
       0,
-      Math.min(guest.maxGuests, Number(formData.stOseb || 0) || 0),
+      Math.min(guest.maxGuests, Number(formData.stOseb || 0) || 0)
     );
 
-    const coming = formData.udelezba === "da";
-    const cerkvena = coming ? !!formData.cerkvena : false;
-    const civilna = coming ? !!formData.civilna : false;
-    const ohcet = coming ? !!formData.ohcet : false;
+    // implicitno po vabilu (po tokenu)
+    const cerkvena = coming ? guest.invites.cerkvena : false;
+    const civilna = coming ? guest.invites.civilna : false;
+    const ohcet = coming ? guest.invites.ohcet : false;
 
     setIsLoading(true);
     try {
@@ -186,7 +181,8 @@ const RSVPSection = () => {
           cerkvena: cerkvena ? "da" : "ne",
           civilna: civilna ? "da" : "ne",
           ohcet: ohcet ? "da" : "ne",
-          igra: coming && cerkvena ? formData.igra : "",
+          // igro ohranimo samo za vabljene na cerkveno
+          igra: coming && guest.invites.cerkvena ? formData.igra : "",
           opombe: formData.opombe,
           source: "github-pages",
         }),
@@ -325,80 +321,23 @@ const RSVPSection = () => {
                   </div>
                 )}
 
-                {formData.udelezba === "da" && (
-                  <div className="space-y-3">
-                    <Label>Katerih delov se udeležite?</Label>
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-3">
-                        <Checkbox
-                          id="evt-cerkvena"
-                          checked={!!formData.cerkvena}
-                          disabled={!guest.invites.cerkvena}
-                          onCheckedChange={(v) => handleChange("cerkvena", !!v)}
-                        />
-                        <Label
-                          htmlFor="evt-cerkvena"
-                          className={!guest.invites.cerkvena ? "opacity-50" : ""}
-                        >
-                          Cerkvena poroka
-                        </Label>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <Checkbox
-                          id="evt-civilna"
-                          checked={!!formData.civilna}
-                          disabled={!guest.invites.civilna}
-                          onCheckedChange={(v) => handleChange("civilna", !!v)}
-                        />
-                        <Label
-                          htmlFor="evt-civilna"
-                          className={!guest.invites.civilna ? "opacity-50" : ""}
-                        >
-                          Civilna poroka
-                        </Label>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <Checkbox
-                          id="evt-ohcet"
-                          checked={!!formData.ohcet}
-                          disabled={!guest.invites.ohcet}
-                          onCheckedChange={(v) => handleChange("ohcet", !!v)}
-                        />
-                        <Label
-                          htmlFor="evt-ohcet"
-                          className={!guest.invites.ohcet ? "opacity-50" : ""}
-                        >
-                          Ohcet / slavje
-                        </Label>
-                      </div>
-                    </div>
-                    <p className="text-xs text-muted-foreground font-body">
-                      Če je kakšna sprememba v zadnjem trenutku, napiši v opombe.
-                    </p>
+                {formData.udelezba === "da" && guest.invites.cerkvena && (
+                  <div className="space-y-2">
+                    <Label>
+                      Koliko časa misliš, da bo trajala cerkvena poroka? (v
+                      minutah)
+                    </Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      max="240"
+                      value={formData.igra}
+                      onChange={(e) => handleChange("igra", e.target.value)}
+                      required
+                      className="w-40"
+                    />
                   </div>
                 )}
-
-                {formData.udelezba === "da" &&
-                  guest.invites.cerkvena &&
-                  !!formData.cerkvena && (
-                    <div className="space-y-2">
-                      <Label>
-                        Koliko časa misliš, da bo trajala cerkvena poroka? (v
-                        minutah)
-                      </Label>
-                      <Input
-                        type="number"
-                        min="1"
-                        max="240"
-                        value={formData.igra}
-                        onChange={(e) => handleChange("igra", e.target.value)}
-                        required
-                        className="w-40"
-                      />
-                    </div>
-                  )}
 
                 <div className="space-y-2">
                   <Label>Opombe (neobvezno)</Label>
