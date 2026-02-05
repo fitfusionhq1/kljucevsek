@@ -1,123 +1,195 @@
-import { useGuest } from "@/lib/useGuest";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { MapPin, Clock, Calendar } from "lucide-react";
-import floralDivider from "@/assets/floral-divider.png";
+import { Calendar, MapPin } from "lucide-react";
+
+const ENDPOINT =
+  "https://script.google.com/macros/s/AKfycbwys_V8pynyeR0x4D08vc7d8tPSNTdnrn70J1yF2uKZ2RnEo6rM1uPBe_9VRkjvrPw5/exec";
+
+type Guest = {
+  token: string;
+  groupName?: string;
+  maxGuests?: number;
+  likelyGuests?: number;
+  cerkvenaInvited?: boolean;
+  civilnaInvited?: boolean;
+  ohcetInvited?: boolean;
+};
+
+function getTokenFromUrl(): string {
+  const t1 = new URLSearchParams(window.location.search).get("t");
+  if (t1) return t1.trim();
+
+  // support hash-router style too, just in case
+  const hash = window.location.hash || "";
+  if (hash.includes("?")) {
+    const query = hash.substring(hash.indexOf("?") + 1);
+    const t2 = new URLSearchParams(query).get("t");
+    if (t2) return t2.trim();
+  }
+
+  return "";
+}
+
+type EventCard = {
+  key: "cerkvena" | "civilna" | "ohcet";
+  title: string;
+  time: string;
+  place: string;
+  address: string;
+};
+
+const ALL_EVENTS: EventCard[] = [
+  {
+    key: "cerkvena",
+    title: "Cerkvena poroka",
+    time: "14:00",
+    place: "Cerkev Marije Pomočnice na Rakovniku",
+    address: "Rakovniška ulica 6",
+  },
+  {
+    key: "civilna",
+    title: "Civilna poroka",
+    time: "—",
+    place: "Dodaj lokacijo civilne poroke",
+    address: "Dodaj naslov",
+  },
+  {
+    key: "ohcet",
+    title: "Ohcet / slavje",
+    time: "—",
+    place: "Dodaj lokacijo slavja",
+    address: "Dodaj naslov",
+  },
+];
+
+function gridColsClass(n: number) {
+  if (n <= 1) return "grid-cols-1";
+  if (n === 2) return "grid-cols-1 md:grid-cols-2";
+  return "grid-cols-1 md:grid-cols-3";
+}
+
+const Card = ({ title, time, place, address }: Omit<EventCard, "key">) => (
+  <motion.div
+    initial={{ opacity: 0, y: 18 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.5 }}
+    className="card-elegant p-8 md:p-10 rounded-sm text-center space-y-4"
+  >
+    <div className="w-14 h-14 mx-auto flex items-center justify-center bg-sage/10 rounded-full">
+      <Calendar className="w-6 h-6 text-sage" />
+    </div>
+
+    <h3 className="font-display text-3xl text-foreground">{title}</h3>
+
+    <div className="font-body text-foreground/90">{time}</div>
+    <div className="font-body text-foreground/90">{place}</div>
+
+    <div className="flex items-center justify-center gap-2 text-foreground/80 font-body">
+      <MapPin className="w-4 h-4" />
+      <span>{address}</span>
+    </div>
+  </motion.div>
+);
 
 const EventDetails = () => {
-  const { guest, loading } = useGuest();
+  const [token, setToken] = useState("");
+  const [guest, setGuest] = useState<Guest | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const hasToken = !!guest;
+  useEffect(() => {
+    setToken(getTokenFromUrl());
+  }, []);
 
-  const message = guest?.ime
-    ? `${guest.ime}, vesela bova, če se nama pridružiš, da lahko najin dan praznujeva še s tabo!`
-    : "Vesela bova, če se nama pridružiš, da lahko najin dan praznujeva še s tabo!";
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      try {
+        if (!token) {
+          setGuest(null);
+          return;
+        }
 
-  const events = [
-    {
-      key: "civilna",
-      title: "Civilni obred",
-      time: "12:00",
-      venue: "Grad Rakovnik",
-      address: "Rakovniška ulica 6",
-      icon: Calendar,
-      visible: hasToken && guest?.civilnaInvited === true,
-    },
-    {
-      key: "cerkvena",
-      title: "Cerkvena poroka",
-      time: "14:00",
-      venue: "Cerkev Marije Pomočnice na Rakovniku",
-      address: "Rakovniška ulica 6",
-      icon: Calendar,
-      visible: true, // vedno
-    },
-    {
-      key: "ohcet",
-      title: "Ohcet",
-      time: "18:30",
-      venue: "Gostišče Rupar",
-      address: "Škofja Loka",
-      icon: Clock,
-      visible: hasToken && guest?.ohcetInvited === true,
-    },
-  ].filter((e) => e.visible);
+        const res = await fetch(
+          `${ENDPOINT}?op=guest&t=${encodeURIComponent(token)}`
+        );
+        const data = await res.json();
+
+        if (!res.ok || data?.ok !== true) {
+          throw new Error(data?.error || `HTTP ${res.status}`);
+        }
+
+        setGuest(data.guest as Guest);
+      } catch {
+        setGuest(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    load();
+  }, [token]);
+
+  const visibleEvents = useMemo(() => {
+    if (!guest) return [];
+
+    const invited = {
+      cerkvena: !!guest.cerkvenaInvited,
+      civilna: !!guest.civilnaInvited,
+      ohcet: !!guest.ohcetInvited,
+    };
+
+    return ALL_EVENTS.filter((e) => invited[e.key]);
+  }, [guest]);
 
   return (
-    <section className="py-20 px-6">
-      <div className="max-w-4xl mx-auto">
+    <section className="py-20 px-6" id="details">
+      <div className="max-w-5xl mx-auto">
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
-          <img
-            src={floralDivider}
-            alt="Floral divider"
-            className="w-48 md:w-64 mx-auto mb-8 opacity-80"
-          />
-
-          <h2 className="heading-display text-4xl md:text-5xl text-foreground mb-2">
+          <h2 className="heading-display text-4xl md:text-5xl text-foreground mb-4">
             Podrobnosti
           </h2>
-
-          {!loading && (
-            <motion.p
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="text-base md:text-lg font-body text-foreground/90 max-w-2xl mx-auto"
-            >
-              {message}
-            </motion.p>
-          )}
-
+          <p className="text-body text-muted-foreground">
+            Vesela bova, če se nama pridružiš, da lahko najin dan praznujeva še s tabo!
+          </p>
           <div className="divider-ornament mt-6" />
         </motion.div>
 
-        <div
-          className={`grid gap-6 md:gap-8 ${
-            events.length === 1
-              ? "md:grid-cols-1"
-              : events.length === 2
-              ? "md:grid-cols-2"
-              : "md:grid-cols-3"
-          }`}
-        >
-          {events.map((event, index) => (
-            <motion.div
-              key={event.key}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 * index, duration: 0.6 }}
-              className="card-elegant p-8 text-center rounded-sm"
-            >
-              <div className="w-12 h-12 mx-auto mb-6 flex items-center justify-center bg-sage/10 rounded-full">
-                <event.icon className="w-6 h-6 text-sage" />
-              </div>
-
-              <h3 className="heading-display text-2xl md:text-3xl text-foreground mb-4">
-                {event.title}
-              </h3>
-
-              <p className="font-display text-xl text-sage mb-4">
-                {event.time}
-              </p>
-
-              <div className="space-y-2">
-                <p className="font-display text-lg text-foreground">
-                  {event.venue}
-                </p>
-                <div className="flex items-center justify-center gap-2 text-muted-foreground">
-                  <MapPin className="w-4 h-4" />
-                  <p className="text-sm font-body">{event.address}</p>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+        {loading ? (
+          <p className="text-center text-sm text-muted-foreground font-body">
+            Nalagam podrobnosti…
+          </p>
+        ) : !token ? (
+          <p className="text-center text-sm text-muted-foreground font-body">
+            Za prikaz podrobnosti odpri stran preko osebnega linka iz vabila.
+          </p>
+        ) : !guest ? (
+          <p className="text-center text-sm text-muted-foreground font-body">
+            Neveljavna povezava. Preveri, da uporabljaš pravi link iz vabila.
+          </p>
+        ) : visibleEvents.length === 0 ? (
+          <p className="text-center text-sm text-muted-foreground font-body">
+            Za to vabilo trenutno ni označenih delov dogodka.
+          </p>
+        ) : (
+          <div className={`grid ${gridColsClass(visibleEvents.length)} gap-8`}>
+            {visibleEvents.map((ev) => (
+              <Card
+                key={ev.key}
+                title={ev.title}
+                time={ev.time}
+                place={ev.place}
+                address={ev.address}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
