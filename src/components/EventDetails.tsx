@@ -49,16 +49,16 @@ const ALL_EVENTS: EventCard[] = [
   {
     key: "civilna",
     title: "Civilna poroka",
-    time: "—",
-    place: "Dodaj lokacijo civilne poroke",
-    address: "Dodaj naslov",
+    time: "12:00",
+    place: "Grad Rakovnik",
+    address: "Rakovniška ulica 6",
   },
   {
     key: "ohcet",
-    title: "Ohcet / slavje",
-    time: "—",
-    place: "Dodaj lokacijo slavja",
-    address: "Dodaj naslov",
+    title: "Ohcet",
+    time: "18.30",
+    place: "Gostišče Rupnik",
+    address: "Sveti Andrej 38, Skofja Loka, Slovenia",
   },
 ];
 
