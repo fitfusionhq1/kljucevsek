@@ -20,7 +20,6 @@ const GallerySection = () => {
       { src: `${import.meta.env.BASE_URL}gallery/05.jpg`, alt: "Galerija 05" },
       { src: `${import.meta.env.BASE_URL}gallery/06.jpg`, alt: "Galerija 06" },
       { src: `${import.meta.env.BASE_URL}gallery/07.jpg`, alt: "Galerija 07" },
-      { src: `${import.meta.env.BASE_URL}gallery/08.jpg`, alt: "Galerija 08" },
       { src: `${import.meta.env.BASE_URL}gallery/10.jpg`, alt: "Galerija 10" },
     ],
     []
