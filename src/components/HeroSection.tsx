@@ -161,24 +161,43 @@ const HeroSection = () => {
                 {message}
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-3 justify-center pt-1">
-                <Button
-                  className="bg-sage hover:bg-sage/90 text-primary-foreground font-body tracking-widest uppercase py-6"
-                  onClick={() => scrollToId("rsvp")}
-                >
-                  <CheckCircle2 className="w-4 h-4 mr-2" />
-                  Potrdi udeležbo
-                </Button>
+          <div className="flex flex-wrap justify-center gap-4 mt-8">
+  <Button
+    asChild
+    size="lg"
+    className="uppercase tracking-widest"
+  >
+    <a href="#rsvp">Potrdi udeležbo</a>
+  </Button>
 
-                <Button
-                  variant="outline"
-                  className="border-sage/40 hover:bg-sage/10 font-body tracking-widest uppercase py-6"
-                  onClick={() => scrollToId("details")}
-                >
-                  <MapPin className="w-4 h-4 mr-2" />
-                  Poglej lokacije
-                </Button>
-              </div>
+  <Button
+    asChild
+    size="lg"
+    variant="secondary"
+    className="uppercase tracking-widest"
+  >
+    <a href="#details">Podrobnosti</a>
+  </Button>
+
+  <Button
+    asChild
+    size="lg"
+    variant="outline"
+    className="uppercase tracking-widest"
+  >
+    <a href="#gallery">Galerija</a>
+  </Button>
+
+  <Button
+    asChild
+    size="lg"
+    variant="outline"
+    className="uppercase tracking-widest"
+  >
+    <a href="#wishlist">Wish lista</a>
+  </Button>
+</div>
+
             </div>
           </motion.div>
         )}
