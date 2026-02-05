@@ -11,7 +11,6 @@ function clampIndex(i: number, n: number) {
 }
 
 const GallerySection = () => {
-  // 1) Tukaj dodaj/uredi slike (iz public/gallery)
   const photos: Photo[] = useMemo(
     () => [
       { src: `${import.meta.env.BASE_URL}gallery/01.jpg`, alt: "Galerija 01" },
@@ -30,33 +29,9 @@ const GallerySection = () => {
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState<1 | -1>(1);
 
-  // 2) Autoplay (po želji)
   const AUTOPLAY = true;
   const AUTOPLAY_MS = 6500;
   const isHovering = useRef(false);
-
-  useEffect(() => {
-    if (!AUTOPLAY || photos.length <= 1) return;
-
-    const id = window.setInterval(() => {
-      if (isHovering.current) return;
-      goNext();
-    }, AUTOPLAY_MS);
-
-    return () => window.clearInterval(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [photos.length, AUTOPLAY]);
-
-  // 3) Keyboard (levo/desno)
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft") goPrev();
-      if (e.key === "ArrowRight") goNext();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [index, photos.length]);
 
   const goTo = (i: number) => {
     const next = clampIndex(i, photos.length);
@@ -73,6 +48,26 @@ const GallerySection = () => {
     setDirection(1);
     setIndex((i) => clampIndex(i + 1, photos.length));
   };
+
+  useEffect(() => {
+    if (!AUTOPLAY || photos.length <= 1) return;
+    const id = window.setInterval(() => {
+      if (isHovering.current) return;
+      goNext();
+    }, AUTOPLAY_MS);
+    return () => window.clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [photos.length, AUTOPLAY]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") goPrev();
+      if (e.key === "ArrowRight") goNext();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [index, photos.length]);
 
   const current = photos[index];
 
@@ -102,7 +97,7 @@ const GallerySection = () => {
         >
           {/* MAIN SLIDE */}
           <div className="card-elegant rounded-sm overflow-hidden shadow-lg">
-            <div className="relative aspect-[16/9] md:aspect-[21/9] bg-black/5">
+            <div className="relative aspect-[16/9] md:aspect-[21/9] bg-black/5 group">
               <AnimatePresence initial={false} custom={direction}>
                 <motion.img
                   key={current?.src}
@@ -118,7 +113,18 @@ const GallerySection = () => {
                 />
               </AnimatePresence>
 
-              {/* GRADIENT for elegance */}
+              {/* HOVER: show full image (contain) */}
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                <div className="absolute inset-0 bg-black/55" />
+                <img
+                  src={current?.src}
+                  alt={current?.alt}
+                  className="absolute inset-0 w-full h-full object-contain p-6"
+                  draggable={false}
+                />
+              </div>
+
+              {/* GRADIENT */}
               <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/35 via-black/0 to-black/0" />
 
               {/* ARROWS */}
@@ -197,17 +203,31 @@ const GallerySection = () => {
                   onClick={() => goTo(i)}
                   className={[
                     "overflow-hidden rounded-sm border transition-all",
-                    i === index ? "border-foreground/50" : "border-foreground/15 hover:border-foreground/30",
+                    i === index
+                      ? "border-foreground/50"
+                      : "border-foreground/15 hover:border-foreground/30",
                   ].join(" ")}
                   aria-label={`Odpri sliko ${i + 1}`}
                 >
-                  <img
-                    src={p.src}
-                    alt={p.alt}
-                    className="w-full h-20 object-cover"
-                    loading="lazy"
-                    draggable={false}
-                  />
+                  <div className="relative h-20 group">
+                    <img
+                      src={p.src}
+                      alt={p.alt}
+                      className="w-full h-20 object-cover"
+                      loading="lazy"
+                      draggable={false}
+                    />
+                    {/* hover full thumbnail */}
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none">
+                      <div className="absolute inset-0 bg-black/55" />
+                      <img
+                        src={p.src}
+                        alt={p.alt}
+                        className="absolute inset-0 w-full h-full object-contain p-2"
+                        draggable={false}
+                      />
+                    </div>
+                  </div>
                 </button>
               ))}
             </div>
