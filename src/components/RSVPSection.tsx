@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -7,18 +7,68 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Heart } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const ENDPOINT =
-  "https://script.google.com/macros/s/AKfycbxymiLpPqYbhq8D3XeMHIxBRuqWLwaNs-1e--0xbzHtndFlCLOwRnSR0jmkq0RqYvGY/exec";
+  "https://script.google.com/macros/s/AKfycbz7liXEZYv9k-bjZc_58zYhxSBaow8dVqIOGqK8gbS78orMrOBSchRHI59mFiTioMa9/exec";
 
 type Guest = {
   token: string;
-  ime: string;
-  priimek: string;
-  civilnaInvited: boolean;
-  ohcetInvited: boolean;
-  invitedLabel: string;
+
+  // New (family / couple invites)
+  groupName?: string;
+  maxGuests?: number;
+  likelyGuests?: number;
+  cerkvenaInvited?: boolean;
+  civilnaInvited?: boolean;
+  ohcetInvited?: boolean;
+
+  // Legacy (single-person invites)
+  ime?: string;
+  priimek?: string;
+
+  invitedLabel?: string;
 };
+
+type GuestNormalized = {
+  token: string;
+  displayName: string;
+  maxGuests: number;
+  likelyGuests: number;
+  invites: {
+    cerkvena: boolean;
+    civilna: boolean;
+    ohcet: boolean;
+  };
+  invitedLabel?: string;
+};
+
+function normalizeGuest(g: Guest): GuestNormalized {
+  const displayName =
+    (g.groupName && g.groupName.trim()) ||
+    [g.ime, g.priimek].filter(Boolean).join(" ").trim() ||
+    "Gost";
+
+  const maxGuests = Math.max(1, Number(g.maxGuests ?? 1) || 1);
+  const likelyGuests = Math.min(
+    maxGuests,
+    Math.max(1, Number(g.likelyGuests ?? maxGuests) || maxGuests),
+  );
+
+  // backwards compatible defaults
+  const cerkvena = g.cerkvenaInvited ?? true;
+  const civilna = g.civilnaInvited ?? false;
+  const ohcet = g.ohcetInvited ?? false;
+
+  return {
+    token: g.token,
+    displayName,
+    maxGuests,
+    likelyGuests,
+    invites: { cerkvena, civilna, ohcet },
+    invitedLabel: g.invitedLabel,
+  };
+}
 
 function getTokenFromUrl(): string {
   const t1 = new URLSearchParams(window.location.search).get("t");
@@ -37,22 +87,37 @@ function getTokenFromUrl(): string {
 const RSVPSection = () => {
   const [token, setToken] = useState<string>("");
 
-useEffect(() => {
-  setToken(getTokenFromUrl());
-}, []);
+  useEffect(() => {
+    setToken(getTokenFromUrl());
+  }, []);
 
-  const [guest, setGuest] = useState<Guest | null>(null);
+  const [guest, setGuest] = useState<GuestNormalized | null>(null);
   const [loadingGuest, setLoadingGuest] = useState(true);
 
-  const message = guest?.ime
-    ? `${guest.ime}, vesela bova, če se nama pridružiš, da lahko najin dan praznujeva še s tabo!`
+  const message = guest?.displayName
+    ? `${guest.displayName}, vesela bova, če se nama pridružiš, da lahko najin dan praznujeva še s tabo!`
     : "Vesela bova, če se nama pridružiš, da lahko najin dan praznujeva še s tabo!";
 
   const [formData, setFormData] = useState({
     udelezba: "da",
+    stOseb: "1",
+    cerkvena: true,
+    civilna: true,
+    ohcet: true,
     igra: "60",
     opombe: "",
   });
+
+  useEffect(() => {
+    if (!guest) return;
+    setFormData((prev) => ({
+      ...prev,
+      stOseb: String(guest.likelyGuests),
+      cerkvena: guest.invites.cerkvena,
+      civilna: guest.invites.civilna,
+      ohcet: guest.invites.ohcet,
+    }));
+  }, [guest]);
 
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -75,7 +140,7 @@ useEffect(() => {
           throw new Error(data?.error || `HTTP ${res.status}`);
         }
 
-        setGuest(data.guest as Guest);
+        setGuest(normalizeGuest(data.guest as Guest));
       } catch (err: any) {
         toast.error("Neveljavna RSVP povezava.", {
           description: err?.message || "Uporabi osebni link iz vabila.",
@@ -89,13 +154,23 @@ useEffect(() => {
     load();
   }, [token]);
 
-  const handleChange = (field: string, value: string) => {
+  const handleChange = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!guest) return;
+
+    const stOsebNum = Math.max(
+      0,
+      Math.min(guest.maxGuests, Number(formData.stOseb || 0) || 0),
+    );
+
+    const coming = formData.udelezba === "da";
+    const cerkvena = coming ? !!formData.cerkvena : false;
+    const civilna = coming ? !!formData.civilna : false;
+    const ohcet = coming ? !!formData.ohcet : false;
 
     setIsLoading(true);
     try {
@@ -105,8 +180,13 @@ useEffect(() => {
         body: JSON.stringify({
           op: "rsvp",
           token: guest.token,
-          udelezba: formData.udelezba,
-          igra: formData.udelezba === "da" ? formData.igra : "",
+          ime: guest.displayName,
+          udelezba: coming ? "da" : "ne",
+          stOseb: coming ? stOsebNum : 0,
+          cerkvena: cerkvena ? "da" : "ne",
+          civilna: civilna ? "da" : "ne",
+          ohcet: ohcet ? "da" : "ne",
+          igra: coming && cerkvena ? formData.igra : "",
           opombe: formData.opombe,
           source: "github-pages",
         }),
@@ -193,7 +273,7 @@ useEffect(() => {
             <>
               <div className="text-center space-y-2">
                 <div className="font-display text-foreground text-lg md:text-xl">
-                  {guest.ime} {guest.priimek}
+                  {guest.displayName}
                 </div>
 
                 <motion.p
@@ -227,21 +307,98 @@ useEffect(() => {
 
                 {formData.udelezba === "da" && (
                   <div className="space-y-2">
-                    <Label>
-                      Koliko časa misliš, da bo trajala cerkvena poroka? (v
-                      minutah)
-                    </Label>
+                    <Label>Koliko vas pride? (največ {guest.maxGuests})</Label>
                     <Input
                       type="number"
                       min="1"
-                      max="240"
-                      value={formData.igra}
-                      onChange={(e) => handleChange("igra", e.target.value)}
+                      max={String(guest.maxGuests)}
+                      value={formData.stOseb}
+                      onChange={(e) => handleChange("stOseb", e.target.value)}
                       required
                       className="w-40"
                     />
+                    {guest.invitedLabel && (
+                      <p className="text-xs text-muted-foreground font-body">
+                        {guest.invitedLabel}
+                      </p>
+                    )}
                   </div>
                 )}
+
+                {formData.udelezba === "da" && (
+                  <div className="space-y-3">
+                    <Label>Katerih delov se udeležite?</Label>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-3">
+                        <Checkbox
+                          id="evt-cerkvena"
+                          checked={!!formData.cerkvena}
+                          disabled={!guest.invites.cerkvena}
+                          onCheckedChange={(v) => handleChange("cerkvena", !!v)}
+                        />
+                        <Label
+                          htmlFor="evt-cerkvena"
+                          className={!guest.invites.cerkvena ? "opacity-50" : ""}
+                        >
+                          Cerkvena poroka
+                        </Label>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <Checkbox
+                          id="evt-civilna"
+                          checked={!!formData.civilna}
+                          disabled={!guest.invites.civilna}
+                          onCheckedChange={(v) => handleChange("civilna", !!v)}
+                        />
+                        <Label
+                          htmlFor="evt-civilna"
+                          className={!guest.invites.civilna ? "opacity-50" : ""}
+                        >
+                          Civilna poroka
+                        </Label>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <Checkbox
+                          id="evt-ohcet"
+                          checked={!!formData.ohcet}
+                          disabled={!guest.invites.ohcet}
+                          onCheckedChange={(v) => handleChange("ohcet", !!v)}
+                        />
+                        <Label
+                          htmlFor="evt-ohcet"
+                          className={!guest.invites.ohcet ? "opacity-50" : ""}
+                        >
+                          Ohcet / slavje
+                        </Label>
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground font-body">
+                      Če je kakšna sprememba v zadnjem trenutku, napiši v opombe.
+                    </p>
+                  </div>
+                )}
+
+                {formData.udelezba === "da" &&
+                  guest.invites.cerkvena &&
+                  !!formData.cerkvena && (
+                    <div className="space-y-2">
+                      <Label>
+                        Koliko časa misliš, da bo trajala cerkvena poroka? (v
+                        minutah)
+                      </Label>
+                      <Input
+                        type="number"
+                        min="1"
+                        max="240"
+                        value={formData.igra}
+                        onChange={(e) => handleChange("igra", e.target.value)}
+                        required
+                        className="w-40"
+                      />
+                    </div>
+                  )}
 
                 <div className="space-y-2">
                   <Label>Opombe (neobvezno)</Label>
