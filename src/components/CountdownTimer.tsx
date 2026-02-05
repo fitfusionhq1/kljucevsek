@@ -1,68 +1,80 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
-interface CountdownTimerProps {
+type CountdownTimerProps = {
   targetDate: Date;
-}
+};
 
-interface TimeLeft {
+type TimeLeft = {
   days: number;
   hours: number;
   minutes: number;
   seconds: number;
+};
+
+function calc(targetDate: Date): TimeLeft | null {
+  const diff = targetDate.getTime() - Date.now();
+  if (diff <= 0) return null;
+
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const minutes = Math.floor((diff / (1000 * 60)) % 60);
+  const seconds = Math.floor((diff / 1000) % 60);
+
+  return { days, hours, minutes, seconds };
 }
 
+const pad = (n: number) => String(n).padStart(2, "0");
+
 const CountdownTimer = ({ targetDate }: CountdownTimerProps) => {
-  const [timeLeft, setTimeLeft] = useState<TimeLeft>({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(() =>
+    calc(targetDate)
+  );
 
   useEffect(() => {
-    const calculateTimeLeft = () => {
-      const difference = targetDate.getTime() - new Date().getTime();
-      
-      if (difference > 0) {
-        setTimeLeft({
-          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-          hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-          minutes: Math.floor((difference / 1000 / 60) % 60),
-          seconds: Math.floor((difference / 1000) % 60),
-        });
-      }
-    };
+    const id = window.setInterval(() => {
+      setTimeLeft(calc(targetDate));
+    }, 1000);
 
-    calculateTimeLeft();
-    const timer = setInterval(calculateTimeLeft, 1000);
-
-    return () => clearInterval(timer);
+    return () => window.clearInterval(id);
   }, [targetDate]);
 
-  const timeUnits = [
-    { label: 'Dni', value: timeLeft.days },
-    { label: 'Ur', value: timeLeft.hours },
-    { label: 'Minut', value: timeLeft.minutes },
-    { label: 'Sekund', value: timeLeft.seconds },
-  ];
+  if (!timeLeft) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6 }}
+        className="text-center font-display text-3xl text-foreground"
+      >
+        Danes je najin dan 💍
+      </motion.div>
+    );
+  }
+
+  const Item = ({ value, label }: { value: string; label: string }) => (
+    <div className="flex flex-col items-center">
+      <div className="font-display text-4xl md:text-5xl text-foreground">
+        {value}
+      </div>
+      <div className="text-xs uppercase tracking-widest text-muted-foreground">
+        {label}
+      </div>
+    </div>
+  );
 
   return (
-    <div className="flex justify-center gap-4 md:gap-8">
-      {timeUnits.map((unit, index) => (
-        <motion.div
-          key={unit.label}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 * index, duration: 0.5 }}
-          className="text-center"
-        >
-          <div className="w-16 h-16 md:w-20 md:h-20 flex items-center justify-center bg-card/60 backdrop-blur-sm border border-sage-light/30 rounded-sm shadow-sm">
-            <span className="text-2xl md:text-3xl font-display font-light text-foreground">
-              {String(unit.value).padStart(2, '0')}
-            </span>
-          </div>
-          <p className="mt-2 text-xs tracking-widest uppercase font-body text-muted-foreground">
-            {unit.label}
-          </p>
-        </motion.div>
-      ))}
-    </div>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      className="flex justify-center gap-6 md:gap-10"
+    >
+      <Item value={String(timeLeft.days)} label="dni" />
+      <Item value={pad(timeLeft.hours)} label="ur" />
+      <Item value={pad(timeLeft.minutes)} label="minut" />
+      <Item value={pad(timeLeft.seconds)} label="sekund" />
+    </motion.div>
   );
 };
 

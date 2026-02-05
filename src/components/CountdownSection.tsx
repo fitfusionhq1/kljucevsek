@@ -1,9 +1,8 @@
-import { motion } from 'framer-motion';
-import CountdownTimer from './CountdownTimer';
+import { motion } from "framer-motion";
+import CountdownTimer from "./CountdownTimer";
 
 const CountdownSection = () => {
-  // Wedding date: July 11, 2026 at 12:00 PM
-  const weddingDate = new Date('2026-07-11T12:00:00');
+  const weddingDate = new Date(Date.UTC(2026, 6, 11, 10, 0, 0));
 
   return (
     <section className="py-20 px-6 bg-muted/30">
