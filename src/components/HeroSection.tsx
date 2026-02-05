@@ -194,7 +194,7 @@ const HeroSection = () => {
     variant="outline"
     className="uppercase tracking-widest"
   >
-    <a href="#wishlist">Wish lista</a>
+    <a href="#Seznam Daril">Seznam daril</a>
   </Button>
 </div>
 
