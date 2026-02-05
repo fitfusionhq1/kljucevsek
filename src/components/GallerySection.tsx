@@ -13,14 +13,14 @@ function clampIndex(i: number, n: number) {
 const GallerySection = () => {
   const photos: Photo[] = useMemo(
     () => [
-      { src: `${import.meta.env.BASE_URL}gallery/01.jpg`, alt: "Galerija 01" },
-      { src: `${import.meta.env.BASE_URL}gallery/02.jpg`, alt: "Galerija 02" },
-      { src: `${import.meta.env.BASE_URL}gallery/03.jpg`, alt: "Galerija 03" },
-      { src: `${import.meta.env.BASE_URL}gallery/04.jpg`, alt: "Galerija 04" },
-      { src: `${import.meta.env.BASE_URL}gallery/05.jpg`, alt: "Galerija 05" },
-      { src: `${import.meta.env.BASE_URL}gallery/06.jpg`, alt: "Galerija 06" },
-      { src: `${import.meta.env.BASE_URL}gallery/07.jpg`, alt: "Galerija 07" },
-      { src: `${import.meta.env.BASE_URL}gallery/10.jpg`, alt: "Galerija 10" },
+      { src: `${import.meta.env.BASE_URL}gallery/01.jpg`, alt: "27 Jun 2022" },
+      { src: `${import.meta.env.BASE_URL}gallery/02.jpg`, alt: "1 Jan 2023" },
+      { src: `${import.meta.env.BASE_URL}gallery/03.jpg`, alt: "21 Apr 2023" },
+      { src: `${import.meta.env.BASE_URL}gallery/04.jpg`, alt: "29 Apr 2023" },
+      { src: `${import.meta.env.BASE_URL}gallery/05.jpg`, alt: "5 Sep 2023" },
+      { src: `${import.meta.env.BASE_URL}gallery/06.jpg`, alt: "1 Nov 2023" },
+      { src: `${import.meta.env.BASE_URL}gallery/07.jpg`, alt: "24 Sep 2022" },
+      { src: `${import.meta.env.BASE_URL}gallery/10.jpg`, alt: "30 Dec 2024" },
     ],
     []
   );
