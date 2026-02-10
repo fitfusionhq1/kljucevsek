@@ -1,48 +1,63 @@
 // src/lib/invitationText.ts
 
-function formatNames(raw: string) {
-  const s = raw.trim();
-  const lower = s.toLowerCase();
+function splitPeople(raw: string): string[] {
+  const s = raw.trim().replace(/\s+/g, " ");
+  if (!s) return [];
 
-  if (lower.startsWith("družina ") || lower === "bend") return s;
-
-  const parts = s
-    .replace(/\s+/g, " ")
+  // Razbijanje po vejicah + " in "
+  return s
     .split(",")
-    .map(p => p.trim())
+    .map((p) => p.trim())
     .filter(Boolean)
-    .flatMap(p => p.split(" in ").map(x => x.trim()).filter(Boolean));
+    .flatMap((p) =>
+      p
+        .split(" in ")
+        .map((x) => x.trim())
+        .filter(Boolean)
+    );
+}
 
+function isGroupAlwaysPlural(raw: string): boolean {
+  const s = raw.trim().toLowerCase();
+  return s.startsWith("družina ") || s === "bend";
+}
+
+function formatNames(raw: string): string {
+  const s = raw.trim().replace(/\s+/g, " ");
+  if (!s) return s;
+
+  if (isGroupAlwaysPlural(s)) return s;
+
+  const parts = splitPeople(s);
+
+  // Če sta 1 ali 2, pustimo original (ker je običajno že lep zapis).
   if (parts.length <= 2) return s;
 
+  // Lepši zapis za 3+ : "A, B in C"
   return parts.slice(0, -1).join(", ") + " in " + parts[parts.length - 1];
 }
 
-function groupCount(raw: string) {
-  const s = raw.trim();
-  const lower = s.toLowerCase();
+function countPeople(raw: string): number {
+  const s = raw.trim().replace(/\s+/g, " ");
+  if (!s) return 1;
 
-  if (lower.startsWith("družina ") || lower === "bend") return 3;
+  if (isGroupAlwaysPlural(s)) return 3; // treat as plural
 
-  const parts = s
-    .replace(/\s+/g, " ")
-    .split(",")
-    .map(p => p.trim())
-    .filter(Boolean)
-    .flatMap(p => p.split(" in ").map(x => x.trim()).filter(Boolean));
-
+  const parts = splitPeople(s);
   return Math.max(1, parts.length);
 }
 
-export function invitationSentence(rawGroupLine: string) {
-  const namesText = formatNames(rawGroupLine);
-  const n = groupCount(rawGroupLine);
+export function invitationSentence(displayName: string): string {
+  const name = formatNames(displayName);
+  const n = countPeople(displayName);
 
   if (n === 1) {
-    return `${namesText}, vesela bova, če se nama pridružiš, da lahko najin dan praznujeva še s tabo!`;
+    return `${name}, vesela bova, če se nama pridružiš, da lahko najin dan praznujeva še s tabo!`;
   }
+
   if (n === 2) {
-    return `${namesText}, vesela bova, če se nama pridružita, da lahko najin dan praznujeva še z vama!`;
+    return `${name}, vesela bova, če se nama pridružita, da lahko najin dan praznujeva še z vama!`;
   }
-  return `${namesText}, vesela bova, če se nam pridružite, da lahko najin dan praznujeva še z vami!`;
+
+  return `${name}, vesela bova, če se nam pridružite, da lahko najin dan praznujeva še z vami!`;
 }
