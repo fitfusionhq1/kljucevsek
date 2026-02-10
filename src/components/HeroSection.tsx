@@ -3,6 +3,8 @@ import floralHeader from "@/assets/floral-header.png";
 import coupleHero from "@/assets/couple-hero.webp";
 import vidPhoto from "@/assets/vid.jpg";
 import katarinaPhoto from "@/assets/katarina.jpg";
+import { invitationSentence } from "@/lib/invitationText";
+
 
 import { Button } from "@/components/ui/button";
 import { MapPin, CheckCircle2 } from "lucide-react";
