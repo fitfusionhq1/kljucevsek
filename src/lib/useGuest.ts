@@ -1,23 +1,24 @@
 import { useEffect, useMemo, useState } from "react";
 
 const ENDPOINT =
-  "https://script.google.com/macros/s/AKfycbxymiLpPqYbhq8D3XeMHIxBRuqWLwaNs-1e--0xbzHtndFlCLOwRnSR0jmkq0RqYvGY/exec"; // ⬅️ NUJNO zamenjaj
+  "https://script.google.com/macros/s/AKfycbw831bYeeoXiHa2h_dyS6Yj06e2Ge-s11ade-QxgEREW8tiO-6GFV3Jt0oPsozNXfIg/exec";
 
 export type Guest = {
   token: string;
-  ime: string;
-  priimek: string;
+  groupName: string;     // iz stolpca "Gost"
+  displayName: string;   // alias (isto kot groupName)
+  maxGuests: number;
+  likelyGuests: number;
+  cerkvenaInvited: boolean;
   civilnaInvited: boolean;
   ohcetInvited: boolean;
   invitedLabel: string;
 };
 
 function getTokenFromUrl(): string {
-  // ?t=...
   const t1 = new URLSearchParams(window.location.search).get("t");
   if (t1) return t1.trim();
 
-  // #rsvp?t=...
   const hash = window.location.hash || "";
   const qIndex = hash.indexOf("?");
   if (qIndex >= 0) {
