@@ -1,6 +1,4 @@
 // src/lib/invitationText.ts
-import { invitationSentence } from "@/lib/invitationText";
-
 
 function formatNames(raw: string) {
   const s = raw.trim();
