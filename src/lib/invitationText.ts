@@ -1,3 +1,5 @@
+// src/lib/invitationText.ts
+
 function splitPeople(raw: string): string[] {
   const s = raw.trim().replace(/\s+/g, " ");
   if (!s) return [];
