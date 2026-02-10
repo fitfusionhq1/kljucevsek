@@ -10,7 +10,7 @@ import { Heart } from "lucide-react";
 import { invitationSentence } from "@/lib/invitationText";
 
 const ENDPOINT =
-  "https://script.google.com/macros/s/AKfycbz7liXEZYv9k-bjZc_58zYhxSBaow8dVqIOGqK8gbS78orMrOBSchRHI59mFiTioMa9/exec";
+  "https://script.google.com/macros/s/AKfycbw831bYeeoXiHa2h_dyS6Yj06e2Ge-s11ade-QxgEREW8tiO-6GFV3Jt0oPsozNXfIg/exec";
 
 type Guest = {
   token: string;
