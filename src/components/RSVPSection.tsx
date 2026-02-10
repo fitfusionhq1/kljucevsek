@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Heart } from "lucide-react";
+import { invitationSentence } from "@/lib/invitationText";
 
 const ENDPOINT =
   "https://script.google.com/macros/s/AKfycbz7liXEZYv9k-bjZc_58zYhxSBaow8dVqIOGqK8gbS78orMrOBSchRHI59mFiTioMa9/exec";
@@ -94,7 +95,7 @@ const RSVPSection = () => {
   const [loadingGuest, setLoadingGuest] = useState(true);
 
   const message = guest?.displayName
-    ? `${guest.displayName}, vesela bova, če se nama pridružiš, da lahko najin dan praznujeva še s tabo!`
+    ? invitationSentence(guest.displayName)
     : "Vesela bova, če se nama pridružiš, da lahko najin dan praznujeva še s tabo!";
 
   const [formData, setFormData] = useState({
