@@ -51,7 +51,10 @@ const HeroSection = () => {
           transition={{ delay: 0.3, duration: 0.8 }}
           className="text-body text-muted-foreground mb-4"
         >
-          Skupaj s prijatelji in družino
+          <p className="uppercase tracking-widest text-lg md:text-xl font-bold text-white drop-shadow-sm">
+  Skupaj s prijatelji in družino
+</p>
+
         </motion.p>
 
         {/* Couple Photos and Names */}
@@ -138,9 +141,6 @@ const HeroSection = () => {
         >
           <p className="font-display text-3xl md:text-4xl text-foreground font-light">
             Sobota, 11. julij 2026
-          </p>
-          <p className="font-display text-2xl md:text-3xl text-sage mt-2">
-            ob 12. uri
           </p>
         </motion.div>
 
