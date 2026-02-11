@@ -18,8 +18,11 @@ export const TEXTS = {
     detailsSubtitle:
       "Vse, kar moraš vedeti o najinem dnevu - Lokacija, čas in še več.",
     giftsTitle: "Seznam daril",
-    giftsSubtitle:
-      "Najbolj bova vesela finančne pomoči ob začetku najine skupne poti. Če pa bi nama radi kaj podarili, pa ne veste kaj, si lahko pomagate s spodnjim seznamom. Ko izbereš darilo, se prečrta. Odznačiti ga lahko samo ista naprava, ki ga je označila.",
+    giftsSubtitle:{
+      giftsSubtitleLine1: "Najbolj bova vesela finančne pomoči ob začetku najine skupne poti.",
+      giftsSubtitleLine2: "Če pa bi nama radi kaj podarili, pa ne veste kaj, si lahko pomagate s spodnjim seznamom.",
+      giftsSubtitleLine3: "Ko izbereš darilo, se prečrta. Odznačiti ga lahko samo ista naprava, ki ga je označila.",
+    },
     rsvpTitle: "Prosim sporoči",
     rsvpSubtitle: "Sporoči svojo udeležbo do 20. 5. 2026",
     rsvpThankYouTitle: "Hvala!",
