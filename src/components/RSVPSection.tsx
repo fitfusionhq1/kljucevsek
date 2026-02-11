@@ -17,7 +17,7 @@ const ENDPOINT =
   "https://script.google.com/macros/s/AKfycbw831bYeeoXiHa2h_dyS6Yj06e2Ge-s11ade-QxgEREW8tiO-6GFV3Jt0oPsozNXfIg/exec";
 
 type RSVPFormState = {
-  udeležba: "da" | "ne";
+  udelezba: "da" | "ne";
   stOseb: string;
   igra: string; // minutes
   opombe: string;
@@ -29,17 +29,24 @@ export default function RSVPSection() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSending, setIsSending] = useState(false);
 
+  // ✅ Posebno vabilo brez osebne naslovitve:
+  // V stolpec "Gost" v Google Sheets daj vrednost: SPLOSNO_CERKVENA
+  const isGeneralInvite = guest?.displayName === "SPLOSNO_CERKVENA";
+
   const maxGuests = useMemo(() => {
     return guest?.maxGuests && Number.isFinite(guest.maxGuests) ? guest.maxGuests : 1;
   }, [guest]);
 
   const likelyGuests = useMemo(() => {
-    const v = guest?.likelyGuests && Number.isFinite(guest.likelyGuests) ? guest.likelyGuests : maxGuests;
+    const v =
+      guest?.likelyGuests && Number.isFinite(guest.likelyGuests)
+        ? guest.likelyGuests
+        : maxGuests;
     return Math.min(maxGuests, Math.max(1, v));
   }, [guest, maxGuests]);
 
   const [form, setForm] = useState<RSVPFormState>({
-    udeležba: "da",
+    udelezba: "da",
     stOseb: "1",
     igra: "60",
     opombe: "",
@@ -55,9 +62,15 @@ export default function RSVPSection() {
   }, [guest, likelyGuests]);
 
   const message = useMemo(() => {
-    if (guest?.displayName) return invitationSentence(guest.displayName);
+    if (isGeneralInvite) {
+      // Splošna verzija (brez osebne naslovitve)
+      return "Vesela bova, če se nama pridružite, da lahko najin dan praznujeva še z vami!";
+    }
+    if (guest?.displayName) {
+      return invitationSentence(guest.displayName);
+    }
     return "Vesela bova, če se nama pridružiš, da lahko najin dan praznujeva še s tabo!";
-  }, [guest]);
+  }, [guest, isGeneralInvite]);
 
   const setField = <K extends keyof RSVPFormState>(key: K, value: RSVPFormState[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -67,16 +80,15 @@ export default function RSVPSection() {
     e.preventDefault();
     if (!guest) return;
 
-    const coming = form.udeležba === "da";
+    const coming = form.udelezba === "da";
 
     // normaliziraj št. oseb
     const stOsebNumRaw = Number(form.stOseb || 0) || 0;
-    const stOsebNum = coming
-      ? Math.min(maxGuests, Math.max(1, stOsebNumRaw))
-      : 0;
+    const stOsebNum = coming ? Math.min(maxGuests, Math.max(1, stOsebNumRaw)) : 0;
 
-    // igre pošiljamo samo, če so vabljeni na cerkveno (da ne dela zmede v sheetu)
-    const igraMinutes = coming && guest.cerkvenaInvited ? String(Number(form.igra || 0) || "") : "";
+    // igro pošiljamo samo, če so vabljeni na cerkveno
+    const igraMinutes =
+      coming && guest.cerkvenaInvited ? String(Number(form.igra || 0) || "") : "";
 
     setIsSending(true);
     try {
@@ -86,7 +98,8 @@ export default function RSVPSection() {
         body: JSON.stringify({
           op: "rsvp",
           token: guest.token,
-          ime: guest.displayName,
+          // če je splošno vabilo, naj se v sheet zapiše nekaj smiselnega
+          ime: isGeneralInvite ? "SPLOSNO_CERKVENA" : guest.displayName,
           udelezba: coming ? "da" : "ne",
           stOseb: stOsebNum,
           cerkvena: coming && guest.cerkvenaInvited ? "da" : "ne",
@@ -103,7 +116,7 @@ export default function RSVPSection() {
       try {
         data = JSON.parse(text);
       } catch {
-        // če bi Apps Script kdaj vrnil kaj nepričakovanega
+        // ignore
       }
 
       if (!res.ok || data?.ok !== true) {
@@ -176,12 +189,18 @@ export default function RSVPSection() {
           ) : (
             <>
               <div className="text-center space-y-2">
-                <div className="font-display text-foreground text-lg md:text-xl">
-                  {guest.displayName}
-                </div>
+                {/* ✅ če je splošno vabilo, imena ne pokažemo */}
+                {!isGeneralInvite && (
+                  <div className="font-display text-foreground text-lg md:text-xl">
+                    {guest.displayName}
+                  </div>
+                )}
+
                 <p className="text-base md:text-lg font-body text-foreground/90 max-w-xl mx-auto">
                   {message}
                 </p>
+
+                {/* invitedLabel naj ostane (npr. "Vabljeni na cerkveno poroko.") */}
                 {guest.invitedLabel ? (
                   <p className="text-xs md:text-sm text-muted-foreground font-body">
                     {guest.invitedLabel}
@@ -193,8 +212,8 @@ export default function RSVPSection() {
                 <div className="space-y-4">
                   <Label>Ali prideš?</Label>
                   <RadioGroup
-                    value={form.udeležba}
-                    onValueChange={(v) => setField("udeležba", v as "da" | "ne")}
+                    value={form.udelezba}
+                    onValueChange={(v) => setField("udelezba", v as "da" | "ne")}
                     className="flex gap-6"
                   >
                     <div className="flex items-center space-x-2">
@@ -208,7 +227,7 @@ export default function RSVPSection() {
                   </RadioGroup>
                 </div>
 
-                {form.udeležba === "da" && (
+                {form.udelezba === "da" && (
                   <div className="space-y-2">
                     <Label>Koliko vas pride? (največ {maxGuests})</Label>
                     <Input
@@ -223,7 +242,7 @@ export default function RSVPSection() {
                   </div>
                 )}
 
-                {form.udeležba === "da" && guest.cerkvenaInvited && (
+                {form.udelezba === "da" && guest.cerkvenaInvited && (
                   <div className="space-y-2">
                     <Label>
                       Koliko časa misliš, da bo trajala cerkvena poroka? (v minutah)
