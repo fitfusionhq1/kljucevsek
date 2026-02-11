@@ -27,23 +27,8 @@ export const TEXTS = {
     invalidLink: "Ta povezava ni veljavna. Prosim uporabi osebni link iz vabila.",
     loadingInvite: "Nalagam tvoje vabilo…",
   },
-
   rsvp: {
-    // tekst za splošno vabilo brez naslovitve
-    generalMessage:
-      "Vesela bova, če se nama pridružite, da lahko najin dan praznujeva še z vami!",
-
-    // fallback, če ni guest
-    fallbackMessage:
-      "Vesela bova, če se nama pridružiš, da lahko najin dan praznujeva še s tabo!",
-
-    notesPlaceholder: "Alergije, posebne želje…",
-
-    buttons: {
-      submit: "Pošlji odgovor",
-      submitting: "Pošiljam…",
-    },
-
+    // ...
     labels: {
       coming: "Ali prideš?",
       yes: "Pridem",
@@ -52,5 +37,21 @@ export const TEXTS = {
       churchGame: "Koliko časa misliš, da bo trajala cerkvena poroka? (v minutah)",
       notes: "Opombe (neobvezno)",
     },
+  },
+
+  gifts: {
+    loading: "Nalagam seznam daril…",
+    empty: "Trenutno ni daril v seznamu (preveri tab WISHLIST v Sheets).",
+    readErrorTitle: "Ne morem prebrati seznama daril.",
+    readErrorDesc: "Poskusi osvežiti stran.",
+    saveErrorTitle: "Ni uspelo shraniti spremembe.",
+    saveErrorDesc: "Poskusi znova.",
+    marked: "Darilo označeno.",
+    unmarked: "Darilo odznačeno.",
+    linkLabel: "Povezava",
+    mineTag: "(tvoja izbira)",
+    tooltipTaken: "Darilo je že izbrano.",
+    tooltipUnmark: "Klikni za odznačiti.",
+    tooltipMark: "Klikni za označiti.",
   },
 } as const;
