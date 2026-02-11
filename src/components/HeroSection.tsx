@@ -155,55 +155,55 @@ const HeroSection = () => {
             className="mt-10"
           >
             <div className="card-elegant rounded-sm px-6 py-6 md:px-10 md:py-8 max-w-3xl mx-auto space-y-4 text-center">
-              <div className="font-display text-foreground text-xl md:text-2xl">
+              <div className="font-display text-foreground text-2xl md:text-3xl tracking-wide">
+
                 {greeting}
               </div>
 
               <div className="text-base md:text-lg font-body text-foreground/90 max-w-xl mx-auto">
                 {message}
               </div>
+<div className="mt-8">
+  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+    <Button asChild size="lg" className="w-full uppercase tracking-widest">
+      <a href="#rsvp">Potrdi udeležbo</a>
+    </Button>
 
-          <div className="flex flex-wrap justify-center gap-4 mt-8">
-  <Button
-    asChild
-    size="lg"
-    className="uppercase tracking-widest"
-  >
-    <a href="#rsvp">Potrdi udeležbo</a>
-  </Button>
+    <Button
+      asChild
+      size="lg"
+      variant="secondary"
+      className="w-full uppercase tracking-widest"
+    >
+      <a href="#details">Podrobnosti</a>
+    </Button>
 
-  <Button
-    asChild
-    size="lg"
-    variant="secondary"
-    className="uppercase tracking-widest"
-  >
-    <a href="#details">Podrobnosti</a>
-  </Button>
+    <Button
+      asChild
+      size="lg"
+      variant="outline"
+      className="w-full uppercase tracking-widest"
+    >
+      <a href="#gallery">Galerija</a>
+    </Button>
 
-  <Button
-    asChild
-    size="lg"
-    variant="outline"
-    className="uppercase tracking-widest"
-  >
-    <a href="#gallery">Galerija</a>
-  </Button>
+    <Button
+      asChild
+      size="lg"
+      variant="outline"
+      className="w-full uppercase tracking-widest"
+    >
+      <a href="#gifts">Seznam daril</a>
+    </Button>
+  </div>
 
-  <Button
-    asChild
-    size="lg"
-    variant="outline"
-    className="uppercase tracking-widest"
-  >
-    <a href="#gifts">Seznam daril</a>
-  </Button>
+  {/* optional: droben namig pod gumbi */}
+  <p className="mt-4 text-xs md:text-sm text-foreground/70 font-body">
+    Klikni na gumb za hitro navigacijo po strani.
+  </p>
 </div>
 
-            </div>
-          </motion.div>
-        )}
-      </div>
+     
 
       {/* Scroll indicator */}
       <motion.div
