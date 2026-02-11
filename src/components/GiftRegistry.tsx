@@ -139,12 +139,7 @@ export default function GiftRegistry() {
           {TEXTS.sections.giftsSubtitle.giftsSubtitleLine2}
           <br />
           {TEXTS.sections.giftsSubtitle.giftsSubtitleLine3}
-            readonly giftsSubtitleLine2: "Če pa bi nama radi kaj podarili, pa ne veste kaj, si lahko pomagate s spodnjim seznamom.";
-            readonly giftsSubtitleLine3: "Ko izbereš darilo, se prečrta. Odznačiti ga lahko samo ista naprava, ki ga je označila.";
-    ;
-    ... 5 more ...;
-    readonly loadingInvite: "Nalagam tvoje vabilo…";
-
+  
 
           </p>
 
