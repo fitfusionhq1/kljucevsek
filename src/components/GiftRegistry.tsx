@@ -1,91 +1,123 @@
-// src/components/EventDetails.tsx
-
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Calendar, MapPin } from "lucide-react";
-import { TEXTS } from "@/content/texts";
-import { useGuestContext } from "@/lib/GuestContext";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ExternalLink, Gift } from "lucide-react";
+import { toast } from "sonner";
 
-type EventCard = {
-  key: "cerkvena" | "civilna" | "ohcet";
-  title: string;
-  time: string;
-  place: string;
-  address: string;
+import { TEXTS } from "@/content/texts";
+
+type WishlistItem = {
+  id: string;
+  name: string;
+  url: string;
+  taken: boolean;
+  takenBy: string; // anon "guestId"
 };
 
-const ALL_EVENTS: EventCard[] = [
-  {
-    key: "cerkvena",
-    title: "Cerkvena poroka",
-    time: "14:00",
-    place: "Cerkev Marije Pomočnice na Rakovniku",
-    address: "Rakovniška ulica 6",
-  },
-  {
-    key: "civilna",
-    title: "Civilna poroka",
-    time: "12:00",
-    place: "Grad Rakovnik",
-    address: "Rakovniška ulica 6",
-  },
-  {
-    key: "ohcet",
-    title: "Ohcet",
-    time: "18.30",
-    place: "Gostišče Rupnik",
-    address: "Sveti Andrej 38, Škofja Loka, Slovenia",
-  },
-];
+// ⚠️ Tukaj pusti svoj WISHLIST endpoint (ta je drugačen od RSVP)
+const ENDPOINT =
+  "https://script.google.com/macros/s/AKfycbxymiLpPqYbhq8D3XeMHIxBRuqWLwaNs-1e--0xbzHtndFlCLOwRnSR0jmkq0RqYvGY/exec";
 
-function gridColsClass(n: number) {
-  if (n <= 1) return "grid-cols-1";
-  if (n === 2) return "grid-cols-1 md:grid-cols-2";
-  return "grid-cols-1 md:grid-cols-3";
+const GUEST_ID_KEY = "wedding-guest-id";
+
+function getOrCreateGuestId(): string {
+  const existing = localStorage.getItem(GUEST_ID_KEY);
+  if (existing) return existing;
+
+  const id =
+    (crypto?.randomUUID?.() ||
+      `gid_${Math.random().toString(16).slice(2)}_${Date.now()}`);
+
+  localStorage.setItem(GUEST_ID_KEY, id);
+  return id;
 }
 
-const Card = ({ title, time, place, address }: Omit<EventCard, "key">) => (
-  <motion.div
-    initial={{ opacity: 0, y: 18 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true }}
-    transition={{ duration: 0.5 }}
-    className="card-elegant p-8 md:p-10 rounded-sm text-center space-y-4"
-  >
-    <div className="w-14 h-14 mx-auto flex items-center justify-center bg-sage/10 rounded-full">
-      <Calendar className="w-6 h-6 text-sage" />
-    </div>
-
-    <h3 className="font-display text-3xl text-foreground">{title}</h3>
-
-    <div className="font-body text-foreground/90">{time}</div>
-    <div className="font-body text-foreground/90">{place}</div>
-
-    <div className="flex items-center justify-center gap-2 text-foreground/80 font-body">
-      <MapPin className="w-4 h-4" />
-      <span>{address}</span>
-    </div>
-  </motion.div>
-);
-
 export default function GiftRegistry() {
-  const { guest, loading, token } = useGuestContext();
+  const [items, setItems] = useState<WishlistItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const visibleEvents = useMemo(() => {
-    if (!guest) return [];
+  const guestId = getOrCreateGuestId();
 
-    const invited = {
-      cerkvena: !!guest.cerkvenaInvited,
-      civilna: !!guest.civilnaInvited,
-      ohcet: !!guest.ohcetInvited,
-    };
+  const loadWishlist = async (silent = false) => {
+    if (!silent) setIsLoading(true);
+    try {
+      const res = await fetch(`${ENDPOINT}?op=wishlist`);
+      const data = await res.json();
 
-    return ALL_EVENTS.filter((e) => invited[e.key]);
-  }, [guest]);
+      if (!res.ok || data?.ok !== true) {
+        throw new Error(data?.error || `HTTP ${res.status}`);
+      }
+
+      setItems(
+        (data.wishlistOrdered || []).map((x: any) => ({
+          id: String(x.id),
+          name: String(x.name || ""),
+          url: String(x.url || ""),
+          taken: !!x.taken,
+          takenBy: String(x.takenBy || ""),
+        }))
+      );
+    } catch (err: any) {
+      toast.error(TEXTS.gifts.readErrorTitle, {
+        description: err?.message || TEXTS.gifts.readErrorDesc,
+      });
+    } finally {
+      if (!silent) setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadWishlist(false);
+    const t = setInterval(() => loadWishlist(true), 20000);
+    return () => clearInterval(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const setGiftTaken = async (id: string, nextTaken: boolean) => {
+    // optimistic update
+    setItems((prev) =>
+      prev.map((x) =>
+        x.id === id
+          ? { ...x, taken: nextTaken, takenBy: nextTaken ? guestId : "" }
+          : x
+      )
+    );
+
+    try {
+      const res = await fetch(ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          op: "toggle",
+          id,
+          taken: nextTaken,
+          takenBy: nextTaken ? guestId : "",
+        }),
+      });
+
+      const text = await res.text();
+      let parsed: any = null;
+      try {
+        parsed = JSON.parse(text);
+      } catch {}
+
+      if (!res.ok || (parsed && parsed.ok === false)) {
+        throw new Error(parsed?.error || `HTTP ${res.status}`);
+      }
+
+      await loadWishlist(true);
+      toast.success(nextTaken ? TEXTS.gifts.marked : TEXTS.gifts.unmarked);
+    } catch (err: any) {
+      await loadWishlist(false);
+      toast.error(TEXTS.gifts.saveErrorTitle, {
+        description: err?.message || TEXTS.gifts.saveErrorDesc,
+      });
+    }
+  };
 
   return (
     <section className="py-20 px-6" id="gifts">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-3xl mx-auto">
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -93,44 +125,105 @@ export default function GiftRegistry() {
           transition={{ duration: 0.8 }}
           className="text-center mb-12"
         >
-          <h2 className="heading-display text-4xl md:text-5xl text-foreground mb-4">
-            {TEXTS.sections.detailsTitle}
+          <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center bg-sage/10 rounded-full">
+            <Gift className="w-8 h-8 text-sage" />
+          </div>
+
+          <h2 className="heading-display text-4xl md:text-5xl mb-4">
+            {TEXTS.sections.giftsTitle}
           </h2>
-          <p className="text-body text-muted-foreground">
-            {TEXTS.sections.detailsSubtitle}
+
+          <p className="text-body text-muted-foreground max-w-xl mx-auto whitespace-pre-line">
+            {TEXTS.sections.giftsSubtitle}
           </p>
+
           <div className="divider-ornament mt-6" />
         </motion.div>
 
-        {loading ? (
-          <p className="text-center text-sm text-muted-foreground font-body">
-            {TEXTS.sections.loadingInvite}
-          </p>
-        ) : !token ? (
-          <p className="text-center text-sm text-muted-foreground font-body">
-            {TEXTS.sections.invalidLink}
-          </p>
-        ) : !guest ? (
-          <p className="text-center text-sm text-muted-foreground font-body">
-            {TEXTS.sections.invalidLink}
-          </p>
-        ) : visibleEvents.length === 0 ? (
-          <p className="text-center text-sm text-muted-foreground font-body">
-            Za to vabilo trenutno ni označenih delov dogodka.
-          </p>
-        ) : (
-          <div className={`grid ${gridColsClass(visibleEvents.length)} gap-8`}>
-            {visibleEvents.map((ev) => (
-              <Card
-                key={ev.key}
-                title={ev.title}
-                time={ev.time}
-                place={ev.place}
-                address={ev.address}
-              />
-            ))}
-          </div>
-        )}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="card-elegant p-6 md:p-8 rounded-sm"
+        >
+          {isLoading ? (
+            <p className="text-center text-sm text-muted-foreground">
+              {TEXTS.gifts.loading}
+            </p>
+          ) : items.length === 0 ? (
+            <p className="text-center text-sm text-muted-foreground">
+              {TEXTS.gifts.empty}
+            </p>
+          ) : (
+            <ul className="space-y-4">
+              {items.map((item, index) => {
+                const isMine = item.taken && item.takenBy === guestId;
+                const locked = item.taken && !isMine;
+
+                return (
+                  <motion.li
+                    key={item.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4, delay: index * 0.04 }}
+                    className={`flex items-center gap-4 p-4 rounded-sm border transition-all ${
+                      item.taken
+                        ? "bg-muted/50 border-sage/20"
+                        : "bg-background/50 border-sage-light/40 hover:border-sage/40"
+                    }`}
+                  >
+                    <Checkbox
+                      checked={item.taken}
+                      disabled={locked}
+                      onCheckedChange={(v) => setGiftTaken(item.id, !!v)}
+                      className="border-sage data-[state=checked]:bg-sage data-[state=checked]:border-sage"
+                    />
+
+                    <span
+                      className={`flex-1 font-body ${
+                        item.taken ? "line-through text-muted-foreground/60" : ""
+                      }`}
+                      title={
+                        locked
+                          ? TEXTS.gifts.tooltipTaken
+                          : item.taken
+                          ? TEXTS.gifts.tooltipUnmark
+                          : TEXTS.gifts.tooltipMark
+                      }
+                    >
+                      {item.name}
+                      {isMine ? (
+                        <span className="ml-2 text-xs text-muted-foreground/70">
+                          {TEXTS.gifts.mineTag}
+                        </span>
+                      ) : null}
+                    </span>
+
+                    {item.url ? (
+                      <a
+                        href={item.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`flex items-center gap-1 text-sm ${
+                          item.taken
+                            ? "text-muted-foreground/40"
+                            : "text-sage hover:text-sage/80"
+                        }`}
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        <span className="hidden sm:inline">
+                          {TEXTS.gifts.linkLabel}
+                        </span>
+                      </a>
+                    ) : null}
+                  </motion.li>
+                );
+              })}
+            </ul>
+          )}
+        </motion.div>
       </div>
     </section>
   );
