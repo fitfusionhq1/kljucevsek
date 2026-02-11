@@ -129,6 +129,9 @@ const GiftRegistry = () => {
             Seznam daril
           </h2>
           <p className="text-body text-muted-foreground max-w-xl mx-auto">
+            Najbolj bova vesela finančne pomoči ob začetku najine skupne poti.
+            Če pa bi nama radi kaj podarili, pa ne veste kaj, si lahko pomagate s spodnjim seznamom.
+            
             Ko izbereš darilo, se prečrta. Odznačiti ga lahko samo ista naprava,
             ki ga je označila.
           </p>

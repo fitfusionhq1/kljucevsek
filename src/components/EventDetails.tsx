@@ -156,7 +156,7 @@ const EventDetails = () => {
             Podrobnosti
           </h2>
           <p className="text-body text-muted-foreground">
-            Vesela bova, če se nama pridružiš, da lahko najin dan praznujeva še s tabo!
+            Spodaj najdete vse pomembne informacije o dnevu poroke.
           </p>
           <div className="divider-ornament mt-6" />
         </motion.div>
