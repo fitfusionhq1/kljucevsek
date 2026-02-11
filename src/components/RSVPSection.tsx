@@ -8,7 +8,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
-import { useGuest } from "@/lib/useGuest";
+import { useGuestContext } from "@/lib/GuestContext";
+
 import { invitationSentence } from "@/lib/invitationText";
 import { TEXTS } from "@/content/texts";
 
@@ -23,7 +24,7 @@ type RSVPFormState = {
 };
 
 export default function RSVPSection() {
-  const { guest, loading } = useGuest();
+  const { guest, loading } = useGuestContext();
 
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSending, setIsSending] = useState(false);

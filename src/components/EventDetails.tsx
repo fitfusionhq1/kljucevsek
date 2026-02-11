@@ -4,7 +4,8 @@ import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { Calendar, MapPin } from "lucide-react";
 
-import { useGuest } from "@/lib/useGuest";
+import { useGuestContext } from "@/lib/GuestContext";
+
 import { TEXTS } from "@/content/texts";
 
 type EventCard = {
@@ -70,7 +71,8 @@ const Card = ({ title, time, place, address }: Omit<EventCard, "key">) => (
 );
 
 export default function EventDetails() {
-  const { guest, loading, token } = useGuest();
+  const { guest, loading, token } = useGuestContext();
+
 
   const visibleEvents = useMemo(() => {
     if (!guest) return [];

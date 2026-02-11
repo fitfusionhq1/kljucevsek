@@ -4,11 +4,12 @@ import coupleHero from "@/assets/couple-hero.webp";
 import vidPhoto from "@/assets/vid.jpg";
 import katarinaPhoto from "@/assets/katarina.jpg";
 
-import { useGuest } from "@/lib/useGuest";
+import { useGuestContext } from "@/lib/GuestContext";
 import { TEXTS } from "@/content/texts";
 
 const HeroSection = () => {
-  const { guest, loading } = useGuest();
+  const { guest, loading } = useGuestContext();
+
 
   const isGeneralInvite = guest?.displayName === "SPLOSNO_CERKVENA";
 
