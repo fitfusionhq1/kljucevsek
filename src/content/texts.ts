@@ -28,16 +28,30 @@ export const TEXTS = {
     loadingInvite: "Nalagam tvoje vabilo…",
   },
   rsvp: {
-    // ...
-    labels: {
-      coming: "Ali prideš?",
-      yes: "Pridem",
-      no: "Ne pridem",
-      howMany: "Koliko vas pride?",
-      churchGame: "Koliko časa misliš, da bo trajala cerkvena poroka? (v minutah)",
-      notes: "Opombe (neobvezno)",
-    },
+  generalMessage:
+    "Vesela bova, če se nama pridružite, da lahko najin dan praznujeva še z vami!",
+
+  fallbackMessage:
+    "Vesela bova, če se nama pridružiš, da lahko najin dan praznujeva še s tabo!",
+
+  notesPlaceholder: "Alergije, posebne želje…",
+
+  buttons: {
+    submit: "Pošlji odgovor",
+    submitting: "Pošiljam…",
   },
+
+  labels: {
+    coming: "Ali prideš?",
+    yes: "Pridem",
+    no: "Ne pridem",
+    howMany: "Koliko vas pride?",
+    churchGame:
+      "Koliko časa misliš, da bo trajala cerkvena poroka? (v minutah)",
+    notes: "Opombe (neobvezno)",
+  },
+},
+
 
   gifts: {
     loading: "Nalagam seznam daril…",
