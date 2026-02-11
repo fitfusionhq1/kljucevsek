@@ -3,10 +3,8 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { Calendar, MapPin } from "lucide-react";
-
-import { useGuestContext } from "@/lib/GuestContext";
-
 import { TEXTS } from "@/content/texts";
+import { useGuestContext } from "@/lib/GuestContext";
 
 type EventCard = {
   key: "cerkvena" | "civilna" | "ohcet";
@@ -37,6 +35,7 @@ const ALL_EVENTS: EventCard[] = [
     time: "18.30",
     place: "Gostišče Rupnik",
     address: "Sveti Andrej 38, Škofja Loka, Slovenia",
+    // če želiš šumnike povsod: "Škofja Loka"
   },
 ];
 
@@ -72,7 +71,6 @@ const Card = ({ title, time, place, address }: Omit<EventCard, "key">) => (
 
 export default function EventDetails() {
   const { guest, loading, token } = useGuestContext();
-
 
   const visibleEvents = useMemo(() => {
     if (!guest) return [];
