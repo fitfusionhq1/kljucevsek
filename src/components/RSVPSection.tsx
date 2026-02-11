@@ -212,7 +212,7 @@ export default function RSVPSection() {
                 {form.udelezba === "da" && (
                   <div className="space-y-2">
                     <Label>
-                      {TEXTS.rsvp.labels.howManyPrefix} (največ {maxGuests})
+                      {TEXTS.rsvp.labels.howMany} (največ {maxGuests})
                     </Label>
                     <Input
                       type="number"
