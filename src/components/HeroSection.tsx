@@ -3,11 +3,8 @@ import floralHeader from "@/assets/floral-header.png";
 import coupleHero from "@/assets/couple-hero.webp";
 import vidPhoto from "@/assets/vid.jpg";
 import katarinaPhoto from "@/assets/katarina.jpg";
-import { invitationSentence } from "@/lib/invitationText";
-
 
 import { Button } from "@/components/ui/button";
-import { MapPin, CheckCircle2 } from "lucide-react";
 import { useGuest } from "@/lib/useGuest";
 
 function scrollToId(id: string) {
@@ -25,7 +22,7 @@ function scrollToId(id: string) {
 const HeroSection = () => {
   const { guest, loading } = useGuest();
 
-  const greeting = guest?.ime ? `Živjo, ${guest.ime}` : "Živjo";
+  const greeting = guest?.displayName ? `Živjo, ${guest.displayName}` : "Živjo";
   const message = "Za lažjo navigacijo si lahko pomagaš s spodnjimi gumbi.";
 
   return (
@@ -53,10 +50,9 @@ const HeroSection = () => {
           transition={{ delay: 0.3, duration: 0.8 }}
           className="text-body text-muted-foreground mb-4"
         >
-          <p className="uppercase tracking-widest text-lg md:text-xl font-bold text-white drop-shadow-sm">
-  Skupaj s prijatelji in družino
-</p>
-
+          <span className="uppercase tracking-widest text-lg md:text-xl font-bold text-white drop-shadow-sm">
+            Skupaj s prijatelji in družino
+          </span>
         </motion.p>
 
         {/* Couple Photos and Names */}
@@ -146,7 +142,7 @@ const HeroSection = () => {
           </p>
         </motion.div>
 
-        {/* ✅ Invite bar (brez "Tvoje povabilo vključuje") */}
+        {/* Invite bar */}
         {!loading && (
           <motion.div
             initial={{ opacity: 0, y: 14 }}
@@ -154,56 +150,65 @@ const HeroSection = () => {
             transition={{ delay: 1.15, duration: 0.6 }}
             className="mt-10"
           >
-            <div className="card-elegant rounded-sm px-6 py-6 md:px-10 md:py-8 max-w-3xl mx-auto space-y-4 text-center">
+            <div className="card-elegant rounded-2xl px-6 py-6 md:px-10 md:py-8 max-w-3xl mx-auto space-y-4 text-center backdrop-blur-sm">
               <div className="font-display text-foreground text-2xl md:text-3xl tracking-wide">
-
                 {greeting}
               </div>
 
               <div className="text-base md:text-lg font-body text-foreground/90 max-w-xl mx-auto">
                 {message}
               </div>
-<div className="mt-8">
-  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-    <Button asChild size="lg" className="w-full uppercase tracking-widest">
-      <a href="#rsvp">Potrdi udeležbo</a>
-    </Button>
 
-    <Button
-      asChild
-      size="lg"
-      variant="secondary"
-      className="w-full uppercase tracking-widest"
-    >
-      <a href="#details">Podrobnosti</a>
-    </Button>
+              <div className="mt-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                  <Button
+                    type="button"
+                    size="lg"
+                    className="w-full uppercase tracking-widest"
+                    onClick={() => scrollToId("rsvp")}
+                  >
+                    Potrdi udeležbo
+                  </Button>
 
-    <Button
-      asChild
-      size="lg"
-      variant="outline"
-      className="w-full uppercase tracking-widest"
-    >
-      <a href="#gallery">Galerija</a>
-    </Button>
+                  <Button
+                    type="button"
+                    size="lg"
+                    variant="secondary"
+                    className="w-full uppercase tracking-widest"
+                    onClick={() => scrollToId("details")}
+                  >
+                    Podrobnosti
+                  </Button>
 
-    <Button
-      asChild
-      size="lg"
-      variant="outline"
-      className="w-full uppercase tracking-widest"
-    >
-      <a href="#gifts">Seznam daril</a>
-    </Button>
-  </div>
+                  <Button
+                    type="button"
+                    size="lg"
+                    variant="outline"
+                    className="w-full uppercase tracking-widest"
+                    onClick={() => scrollToId("gallery")}
+                  >
+                    Galerija
+                  </Button>
 
-  {/* optional: droben namig pod gumbi */}
-  <p className="mt-4 text-xs md:text-sm text-foreground/70 font-body">
-    Klikni na gumb za hitro navigacijo po strani.
-  </p>
-</div>
+                  <Button
+                    type="button"
+                    size="lg"
+                    variant="outline"
+                    className="w-full uppercase tracking-widest"
+                    onClick={() => scrollToId("gifts")}
+                  >
+                    Seznam daril
+                  </Button>
+                </div>
 
-     
+                <p className="mt-4 text-xs md:text-sm text-foreground/70 font-body">
+                  Klikni na gumb za hitro navigacijo po strani.
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </div>
 
       {/* Scroll indicator */}
       <motion.div
