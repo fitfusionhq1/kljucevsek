@@ -14,7 +14,7 @@ import { invitationSentence } from "@/lib/invitationText";
 import { TEXTS } from "@/content/texts";
 
 const ENDPOINT =
-  "https://script.google.com/macros/s/AKfycbw831bYeeoXiHa2h_dyS6Yj06e2Ge-s11ade-QxgEREW8tiO-6GFV3Jt0oPsozNXfIg/exec";
+  "https://script.google.com/macros/s/AKfycbzGhuAmP-CWj16mgWMKwmTte602VXsBq527D3LTN3hPIEIIKJZ5KelGqb1hi38dac5e/exec";
 
 type RSVPFormState = {
   udelezba: "da" | "ne";

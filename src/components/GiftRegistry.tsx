@@ -24,7 +24,7 @@ type WishlistItem = {
 
 // ⚠️ WISHLIST endpoint
 const ENDPOINT =
-  "https://script.google.com/macros/s/AKfycbxymiLpPqYbhq8D3XeMHIxBRuqWLwaNs-1e--0xbzHtndFlCLOwRnSR0jmkq0RqYvGY/exec";
+  "https://script.google.com/macros/s/AKfycbzGhuAmP-CWj16mgWMKwmTte602VXsBq527D3LTN3hPIEIIKJZ5KelGqb1hi38dac5e/exec";
 
 const GUEST_ID_KEY = "wedding-guest-id";
 
