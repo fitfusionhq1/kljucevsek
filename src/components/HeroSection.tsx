@@ -18,7 +18,7 @@ const HeroSection = () => {
   const introText = isGeneralInvite ? TEXTS.hero.introPersonal : TEXTS.hero.introPersonal;
 
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
+    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pb-32">
       {/* Floral Header */}
       <motion.div
         initial={{ opacity: 0, y: -30 }}
