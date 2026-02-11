@@ -84,7 +84,7 @@ export default function EventDetails() {
   }, [guest]);
 
   return (
-    <section className="py-20 px-6" id="details">
+    <section className="py-20 px-6" id="gifts">
       <div className="max-w-5xl mx-auto">
         <motion.div
           initial={{ opacity: 0 }}
