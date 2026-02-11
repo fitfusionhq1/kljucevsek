@@ -6,9 +6,11 @@ export const TEXTS = {
     inviteLine1: "Vabilo na praznovanje",
     inviteLine2: "najinega skupnega začetka poti",
     dateLine: "Sobota, 11. julij 2026",
-    introPersonal:
-      "NAJVEČJA OD TEH JE LJUBEZEN - in prav to želiva deliti z vami na najin poročni dan."
-    
+    introPersonal: {
+      introPersonalLine1: "Kot je apostol Pavel zapisal v pismu Korinčanom",
+      introPersonalLine2: "- NAJVEČJA OD TEH JE LJUBEZEN -",
+      introPersonalLine3: "in prav to želiva deliti z vami na najin poročni dan."
+    }
   },
 
   sections: {

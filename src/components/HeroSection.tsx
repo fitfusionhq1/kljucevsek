@@ -138,7 +138,11 @@ const HeroSection = () => {
               </div>
 
               <p className="text-lg md:text-xl font-body text-foreground/90 leading-relaxed">
-                {introText}
+                {TEXTS.hero.introPersonal.introPersonalLine1}
+                <br />
+                {TEXTS.hero.introPersonal.introPersonalLine2}
+                <br />
+                {TEXTS.hero.introPersonal.introPersonalLine3}
               </p>
             </div>
           </motion.div>
