@@ -68,7 +68,7 @@ const Card = ({ title, time, place, address }: Omit<EventCard, "key">) => (
   </motion.div>
 );
 
-export default function EventDetails() {
+export default function GiftRegistry() {
   const { guest, loading, token } = useGuestContext();
 
   const visibleEvents = useMemo(() => {
