@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 import { useGuest } from "@/lib/useGuest";
 import { invitationSentence } from "@/lib/invitationText";
+import { TEXTS } from "@/content/texts";
 
 const ENDPOINT =
   "https://script.google.com/macros/s/AKfycbw831bYeeoXiHa2h_dyS6Yj06e2Ge-s11ade-QxgEREW8tiO-6GFV3Jt0oPsozNXfIg/exec";
@@ -27,7 +28,6 @@ export default function RSVPSection() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSending, setIsSending] = useState(false);
 
-  // posebno splošno vabilo (brez osebne naslovitve)
   const isGeneralInvite = guest?.displayName === "SPLOSNO_CERKVENA";
 
   const maxGuests = useMemo(() => {
@@ -55,11 +55,9 @@ export default function RSVPSection() {
   }, [guest, likelyGuests]);
 
   const message = useMemo(() => {
-    if (isGeneralInvite) {
-      return "Vesela bova, če se nama pridružite, da lahko najin dan praznujeva še z vami!";
-    }
+    if (isGeneralInvite) return TEXTS.rsvp.generalMessage;
     if (guest?.displayName) return invitationSentence(guest.displayName);
-    return "Vesela bova, če se nama pridružiš, da lahko najin dan praznujeva še s tabo!";
+    return TEXTS.rsvp.fallbackMessage;
   }, [guest, isGeneralInvite]);
 
   const setField = (key: keyof RSVPFormState, value: string) => {
@@ -110,7 +108,9 @@ export default function RSVPSection() {
       }
 
       setIsSubmitted(true);
-      toast.success("Hvala!", { description: "Tvoj odgovor je shranjen." });
+      toast.success(TEXTS.sections.rsvpThankYouTitle, {
+        description: "Tvoj odgovor je shranjen.",
+      });
     } catch (err: any) {
       console.error(err);
       toast.error("Prišlo je do napake.", {
@@ -127,10 +127,10 @@ export default function RSVPSection() {
         <div className="max-w-2xl mx-auto text-center">
           <div className="card-elegant p-10 md:p-12 rounded-sm">
             <h2 className="heading-display text-3xl md:text-4xl text-foreground mb-4">
-              Hvala!
+              {TEXTS.sections.rsvpThankYouTitle}
             </h2>
             <p className="text-muted-foreground font-body">
-              Tvoj odgovor sva prejela. Komaj čakava, da praznujeva skupaj!
+              {TEXTS.sections.rsvpThankYouText}
             </p>
           </div>
         </div>
@@ -149,11 +149,9 @@ export default function RSVPSection() {
           className="text-center mb-10"
         >
           <h2 className="heading-display text-4xl md:text-5xl text-foreground mb-3">
-            Prosim sporoči
+            {TEXTS.sections.rsvpTitle}
           </h2>
-          <p className="text-body text-muted-foreground">
-            Sporoči svojo udeležbo do 20. 5. 2026
-          </p>
+          <p className="text-body text-muted-foreground">{TEXTS.sections.rsvpSubtitle}</p>
           <div className="divider-ornament mt-6" />
         </motion.div>
 
@@ -166,11 +164,11 @@ export default function RSVPSection() {
         >
           {loading ? (
             <p className="text-center text-sm text-muted-foreground font-body">
-              Nalagam tvoje vabilo…
+              {TEXTS.sections.loadingInvite}
             </p>
           ) : !guest ? (
             <p className="text-center text-sm text-muted-foreground font-body">
-              Ta povezava ni veljavna. Prosim uporabi osebni link iz vabila.
+              {TEXTS.sections.invalidLink}
             </p>
           ) : (
             <>
@@ -194,7 +192,7 @@ export default function RSVPSection() {
 
               <form onSubmit={handleSubmit} className="space-y-8">
                 <div className="space-y-4">
-                  <Label>Ali prideš?</Label>
+                  <Label>{TEXTS.rsvp.labels.coming}</Label>
                   <RadioGroup
                     value={form.udelezba}
                     onValueChange={(v) => setField("udelezba", v)}
@@ -202,18 +200,20 @@ export default function RSVPSection() {
                   >
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="da" id="rsvp-da" />
-                      <Label htmlFor="rsvp-da">Pridem</Label>
+                      <Label htmlFor="rsvp-da">{TEXTS.rsvp.labels.yes}</Label>
                     </div>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="ne" id="rsvp-ne" />
-                      <Label htmlFor="rsvp-ne">Ne pridem</Label>
+                      <Label htmlFor="rsvp-ne">{TEXTS.rsvp.labels.no}</Label>
                     </div>
                   </RadioGroup>
                 </div>
 
                 {form.udelezba === "da" && (
                   <div className="space-y-2">
-                    <Label>Koliko vas pride? (največ {maxGuests})</Label>
+                    <Label>
+                      {TEXTS.rsvp.labels.howManyPrefix} (največ {maxGuests})
+                    </Label>
                     <Input
                       type="number"
                       min={1}
@@ -228,9 +228,7 @@ export default function RSVPSection() {
 
                 {form.udelezba === "da" && guest.cerkvenaInvited && (
                   <div className="space-y-2">
-                    <Label>
-                      Koliko časa misliš, da bo trajala cerkvena poroka? (v minutah)
-                    </Label>
+                    <Label>{TEXTS.rsvp.labels.churchGame}</Label>
                     <Input
                       type="number"
                       min={1}
@@ -244,11 +242,11 @@ export default function RSVPSection() {
                 )}
 
                 <div className="space-y-2">
-                  <Label>Opombe (neobvezno)</Label>
+                  <Label>{TEXTS.rsvp.labels.notes}</Label>
                   <Textarea
                     value={form.opombe}
                     onChange={(e) => setField("opombe", e.target.value)}
-                    placeholder="Alergije, posebne želje…"
+                    placeholder={TEXTS.rsvp.notesPlaceholder}
                   />
                 </div>
 
@@ -257,7 +255,7 @@ export default function RSVPSection() {
                   disabled={isSending}
                   className="w-full py-6 uppercase tracking-widest"
                 >
-                  {isSending ? "Pošiljam…" : "Pošlji odgovor"}
+                  {isSending ? TEXTS.rsvp.buttons.submitting : TEXTS.rsvp.buttons.submit}
                 </Button>
               </form>
             </>

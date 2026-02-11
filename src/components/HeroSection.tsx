@@ -1,5 +1,3 @@
-// src/components/HeroSection.tsx
-
 import { motion } from "framer-motion";
 import floralHeader from "@/assets/floral-header.png";
 import coupleHero from "@/assets/couple-hero.webp";
@@ -7,6 +5,7 @@ import vidPhoto from "@/assets/vid.jpg";
 import katarinaPhoto from "@/assets/katarina.jpg";
 
 import { useGuest } from "@/lib/useGuest";
+import { TEXTS } from "@/content/texts";
 
 const HeroSection = () => {
   const { guest, loading } = useGuest();
@@ -14,11 +13,9 @@ const HeroSection = () => {
   const isGeneralInvite = guest?.displayName === "SPLOSNO_CERKVENA";
 
   const greeting =
-    !isGeneralInvite && guest?.displayName ? `Živjo, ${guest.displayName}` : null;
+    !isGeneralInvite && guest?.displayName ? `Živjo, ${guest.displayName}` : "Živjo";
 
-  const introText = isGeneralInvite
-    ? "Prisrčno vabljeni, da se nama pridružite pri cerkveni poroki in z nama delite ta poseben trenutek."
-    : "Vesela bova, če se nama pridružiš, da lahko najin dan praznujeva še s tabo!";
+  const introText = isGeneralInvite ? TEXTS.hero.introGeneral : TEXTS.hero.introPersonal;
 
   return (
     <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
@@ -46,7 +43,7 @@ const HeroSection = () => {
           className="mb-4"
         >
           <span className="uppercase tracking-widest text-lg md:text-xl font-bold text-white drop-shadow-sm">
-            Skupaj s prijatelji in družino
+            {TEXTS.hero.togetherLine}
           </span>
         </motion.p>
 
@@ -65,11 +62,7 @@ const HeroSection = () => {
               transition={{ delay: 0.6, duration: 0.8 }}
               className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-sage/30 shadow-lg mb-4"
             >
-              <img
-                src={vidPhoto}
-                alt="Vid"
-                className="w-full h-full object-cover object-top"
-              />
+              <img src={vidPhoto} alt="Vid" className="w-full h-full object-cover object-top" />
             </motion.div>
             <h1 className="heading-script text-4xl md:text-5xl lg:text-6xl text-foreground">
               Vid
@@ -84,11 +77,7 @@ const HeroSection = () => {
             className="relative order-first md:order-none"
           >
             <div className="w-48 h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 rounded-full overflow-hidden border-4 border-gold/40 shadow-2xl">
-              <img
-                src={coupleHero}
-                alt="Katarina in Vid"
-                className="w-full h-full object-cover"
-              />
+              <img src={coupleHero} alt="Katarina in Vid" className="w-full h-full object-cover" />
             </div>
             <div className="absolute inset-0 rounded-full ring-2 ring-gold/20 ring-offset-4 ring-offset-background" />
           </motion.div>
@@ -120,10 +109,8 @@ const HeroSection = () => {
           className="mt-8"
         >
           <div className="divider-ornament mb-8" />
-          <p className="text-body text-muted-foreground">Vabilo na praznovanje</p>
-          <p className="text-body text-muted-foreground mt-1">
-            najinega skupnega začetka poti
-          </p>
+          <p className="text-body text-muted-foreground">{TEXTS.hero.inviteLine1}</p>
+          <p className="text-body text-muted-foreground mt-1">{TEXTS.hero.inviteLine2}</p>
         </motion.div>
 
         <motion.div
@@ -133,11 +120,11 @@ const HeroSection = () => {
           className="mt-12"
         >
           <p className="font-display text-3xl md:text-4xl text-foreground font-light">
-            Sobota, 11. julij 2026
+            {TEXTS.hero.dateLine}
           </p>
         </motion.div>
 
-        {/* Intro card (no navigation buttons) */}
+        {/* Intro card */}
         {!loading && (
           <motion.div
             initial={{ opacity: 0, y: 14 }}
@@ -145,12 +132,10 @@ const HeroSection = () => {
             transition={{ delay: 1.15, duration: 0.6 }}
             className="mt-10"
           >
-            <div className="card-elegant rounded-2xl px-6 py-8 md:px-12 md:py-10 max-w-2xl mx-auto text-center backdrop-blur-sm">
-              {greeting && (
-                <div className="font-display text-foreground text-2xl md:text-3xl tracking-wide mb-4">
-                  {greeting}
-                </div>
-              )}
+            <div className="card-elegant rounded-2xl px-6 py-8 md:px-12 md:py-10 max-w-2xl mx-auto text-center backdrop-blur-sm space-y-4">
+              <div className="font-display text-foreground text-2xl md:text-3xl tracking-wide">
+                {greeting}
+              </div>
 
               <p className="text-lg md:text-xl font-body text-foreground/90 leading-relaxed">
                 {introText}
