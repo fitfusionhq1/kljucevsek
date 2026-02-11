@@ -1,29 +1,24 @@
+// src/components/HeroSection.tsx
+
 import { motion } from "framer-motion";
 import floralHeader from "@/assets/floral-header.png";
 import coupleHero from "@/assets/couple-hero.webp";
 import vidPhoto from "@/assets/vid.jpg";
 import katarinaPhoto from "@/assets/katarina.jpg";
 
-import { Button } from "@/components/ui/button";
 import { useGuest } from "@/lib/useGuest";
-
-function scrollToId(id: string) {
-  const el = document.getElementById(id);
-  if (el) {
-    el.scrollIntoView({ behavior: "smooth", block: "start" });
-    return;
-  }
-  setTimeout(() => {
-    const el2 = document.getElementById(id);
-    if (el2) el2.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, 50);
-}
 
 const HeroSection = () => {
   const { guest, loading } = useGuest();
 
-  const greeting = guest?.displayName ? `Živjo, ${guest.displayName}` : "Živjo";
-  const message = "Za lažjo navigacijo si lahko pomagaš s spodnjimi gumbi.";
+  const isGeneralInvite = guest?.displayName === "SPLOSNO_CERKVENA";
+
+  const greeting =
+    !isGeneralInvite && guest?.displayName ? `Živjo, ${guest.displayName}` : null;
+
+  const introText = isGeneralInvite
+    ? "Prisrčno vabljeni, da se nama pridružite pri cerkveni poroki in z nama delite ta poseben trenutek."
+    : "Vesela bova, če se nama pridružiš, da lahko najin dan praznujeva še s tabo!";
 
   return (
     <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
@@ -48,7 +43,7 @@ const HeroSection = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.8 }}
-          className="text-body text-muted-foreground mb-4"
+          className="mb-4"
         >
           <span className="uppercase tracking-widest text-lg md:text-xl font-bold text-white drop-shadow-sm">
             Skupaj s prijatelji in družino
@@ -142,7 +137,7 @@ const HeroSection = () => {
           </p>
         </motion.div>
 
-        {/* Invite bar */}
+        {/* Intro card (no navigation buttons) */}
         {!loading && (
           <motion.div
             initial={{ opacity: 0, y: 14 }}
@@ -150,61 +145,16 @@ const HeroSection = () => {
             transition={{ delay: 1.15, duration: 0.6 }}
             className="mt-10"
           >
-            <div className="card-elegant rounded-2xl px-6 py-6 md:px-10 md:py-8 max-w-3xl mx-auto space-y-4 text-center backdrop-blur-sm">
-              <div className="font-display text-foreground text-2xl md:text-3xl tracking-wide">
-                {greeting}
-              </div>
-
-              <div className="text-base md:text-lg font-body text-foreground/90 max-w-xl mx-auto">
-                {message}
-              </div>
-
-              <div className="mt-6">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-                  <Button
-                    type="button"
-                    size="lg"
-                    className="w-full uppercase tracking-widest"
-                    onClick={() => scrollToId("rsvp")}
-                  >
-                    Potrdi udeležbo
-                  </Button>
-
-                  <Button
-                    type="button"
-                    size="lg"
-                    variant="secondary"
-                    className="w-full uppercase tracking-widest"
-                    onClick={() => scrollToId("details")}
-                  >
-                    Podrobnosti
-                  </Button>
-
-                  <Button
-                    type="button"
-                    size="lg"
-                    variant="outline"
-                    className="w-full uppercase tracking-widest"
-                    onClick={() => scrollToId("gallery")}
-                  >
-                    Galerija
-                  </Button>
-
-                  <Button
-                    type="button"
-                    size="lg"
-                    variant="outline"
-                    className="w-full uppercase tracking-widest"
-                    onClick={() => scrollToId("gifts")}
-                  >
-                    Seznam daril
-                  </Button>
+            <div className="card-elegant rounded-2xl px-6 py-8 md:px-12 md:py-10 max-w-2xl mx-auto text-center backdrop-blur-sm">
+              {greeting && (
+                <div className="font-display text-foreground text-2xl md:text-3xl tracking-wide mb-4">
+                  {greeting}
                 </div>
+              )}
 
-                <p className="mt-4 text-xs md:text-sm text-foreground/70 font-body">
-                  Klikni na gumb za hitro navigacijo po strani.
-                </p>
-              </div>
+              <p className="text-lg md:text-xl font-body text-foreground/90 leading-relaxed">
+                {introText}
+              </p>
             </div>
           </motion.div>
         )}
