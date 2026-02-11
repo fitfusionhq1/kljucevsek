@@ -7,7 +7,7 @@ export const TEXTS = {
     inviteLine2: "najinega skupnega začetka poti",
     dateLine: "Sobota, 11. julij 2026",
     introPersonal:
-      "Vesela bova, če se nama pridružiš, da lahko najin dan praznujeva še s tabo!",
+      "NAJVEČJA OD TEH JE LJUBEZEN - in prav to želiva deliti z vami na najin poročni dan."
     introGeneral:
       "Prisrčno vabljeni, da se nama pridružite pri cerkveni poroki in z nama delite ta poseben trenutek.",
   },
