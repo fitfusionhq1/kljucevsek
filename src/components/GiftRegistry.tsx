@@ -139,6 +139,10 @@ export default function GiftRegistry() {
           {TEXTS.sections.giftsSubtitle.giftsSubtitleLine2}
           <br />
           {TEXTS.sections.giftsSubtitle.giftsSubtitleLine3}
+          <br />
+          {TEXTS.sections.giftsSubtitle.giftsSubtitleLine4}
+          <br />
+          {TEXTS.sections.giftsSubtitle.giftsSubtitleLine5}
   
 
           </p>

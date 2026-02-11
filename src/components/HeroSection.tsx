@@ -143,6 +143,10 @@ const HeroSection = () => {
                 {TEXTS.hero.introPersonal.introPersonalLine2}
                 <br />
                 {TEXTS.hero.introPersonal.introPersonalLine3}
+                <br />
+                {TEXTS.hero.introPersonal.introPersonalLine4}
+                <br />
+                {TEXTS.hero.introPersonal.introPersonalLine5}
               </p>
             </div>
           </motion.div>

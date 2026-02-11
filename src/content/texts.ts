@@ -8,8 +8,10 @@ export const TEXTS = {
     dateLine: "Sobota, 11. julij 2026",
     introPersonal: {
       introPersonalLine1: "Kot je apostol Pavel zapisal v pismu Korinčanom",
-      introPersonalLine2: "- NAJVEČJA OD TEH JE LJUBEZEN -",
-      introPersonalLine3: "in prav to želiva deliti z vami na najin poročni dan."
+      introPersonalLine2: "",
+      introPersonalLine3: "- NAJVEČJA OD TEH JE LJUBEZEN -",
+      introPersonalLine4: "",
+      introPersonalLine5: "bi rada tudi midva poudarila, da je največja od vseh stvari, ki naju povezujejo, prav ljubezen.",
     }
   },
 
@@ -19,9 +21,11 @@ export const TEXTS = {
       "Vse, kar moraš vedeti o najinem dnevu - Lokacija, čas in še več.",
     giftsTitle: "Seznam daril",
     giftsSubtitle:{
-      giftsSubtitleLine1: "Najbolj bova vesela finančne pomoči ob začetku najine skupne poti.",
-      giftsSubtitleLine2: "Če pa bi nama radi kaj podarili, pa ne veste kaj, si lahko pomagate s spodnjim seznamom.",
-      giftsSubtitleLine3: "Ko izbereš darilo, se prečrta. Odznačiti ga lahko samo ista naprava, ki ga je označila.",
+      giftsSubtitleLine1: "Ob začetkuj najine skupne poti bova vesela finančne pomoči.",
+      giftsSubtitleLine2: "",
+      giftsSubtitleLine3: "Če pa bi nama radi kaj podarili, pa ne veste kaj, si lahko pomagate s spodnjim seznamom.",
+      giftsSubtitleLine4: "",
+      giftsSubtitleLine5: "Ko izbereš darilo, se prečrta. Odznačiti ga lahko samo ista naprava, ki ga je označila.",
     },
     rsvpTitle: "Prosim sporoči",
     rsvpSubtitle: "Sporoči svojo udeležbo do 20. 5. 2026",
