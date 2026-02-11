@@ -3,7 +3,6 @@ import floralHeader from "@/assets/floral-header.png";
 import coupleHero from "@/assets/couple-hero.webp";
 import vidPhoto from "@/assets/vid.jpg";
 import katarinaPhoto from "@/assets/katarina.jpg";
-
 import { useGuestContext } from "@/lib/GuestContext";
 import { TEXTS } from "@/content/texts";
 
@@ -16,7 +15,7 @@ const HeroSection = () => {
   const greeting =
     !isGeneralInvite && guest?.displayName ? `Živjo, ${guest.displayName}` : "Živjo";
 
-  const introText = isGeneralInvite ? TEXTS.hero.introGeneral : TEXTS.hero.introPersonal;
+  const introText = isGeneralInvite ? TEXTS.hero.introPersonal : TEXTS.hero.introPersonal;
 
   return (
     <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">

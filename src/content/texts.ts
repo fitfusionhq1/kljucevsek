@@ -8,8 +8,7 @@ export const TEXTS = {
     dateLine: "Sobota, 11. julij 2026",
     introPersonal:
       "NAJVEČJA OD TEH JE LJUBEZEN - in prav to želiva deliti z vami na najin poročni dan."
-    introGeneral:
-      "Prisrčno vabljeni, da se nama pridružite pri cerkveni poroki in z nama delite ta poseben trenutek.",
+    
   },
 
   sections: {
