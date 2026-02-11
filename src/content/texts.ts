@@ -61,19 +61,22 @@ export const TEXTS = {
 },
 
 
-  gifts: {
-    loading: "Nalagam seznam daril…",
-    empty: "Trenutno ni daril v seznamu (preveri tab WISHLIST v Sheets).",
-    readErrorTitle: "Ne morem prebrati seznama daril.",
-    readErrorDesc: "Poskusi osvežiti stran.",
-    saveErrorTitle: "Ni uspelo shraniti spremembe.",
-    saveErrorDesc: "Poskusi znova.",
-    marked: "Darilo označeno.",
-    unmarked: "Darilo odznačeno.",
-    linkLabel: "Povezava",
-    mineTag: "(tvoja izbira)",
-    tooltipTaken: "Darilo je že izbrano.",
-    tooltipUnmark: "Klikni za odznačiti.",
-    tooltipMark: "Klikni za označiti.",
+ gifts: {
+  showList: "Prikaži darila",
+  hideList: "Skrij darila",
+
+  loading: "Nalagam seznam daril…",
+  empty: "Trenutno ni daril v seznamu (preveri tab WISHLIST v Sheets).",
+  readErrorTitle: "Ne morem prebrati seznama daril.",
+  readErrorDesc: "Poskusi osvežiti stran.",
+  saveErrorTitle: "Ni uspelo shraniti spremembe.",
+  saveErrorDesc: "Poskusi znova.",
+  marked: "Darilo označeno.",
+  unmarked: "Darilo odznačeno.",
+  linkLabel: "Povezava",
+  mineTag: "(tvoja izbira)",
+  tooltipTaken: "Darilo je že izbrano.",
+  tooltipUnmark: "Klikni za odznačiti.",
+  tooltipMark: "Klikni za označiti.",
   },
 } as const;
