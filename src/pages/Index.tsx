@@ -5,10 +5,13 @@ import GiftRegistry from '@/components/GiftRegistry';
 import RSVPSection from '@/components/RSVPSection';
 import Footer from '@/components/Footer';
 import GallerySection from "@/components/GallerySection";
+import IconNav from "@/components/IconNav";
+
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <HeroSection />
+      <IconNav />
       <CountdownSection />
       <GallerySection />
       <EventDetails />
