@@ -15,10 +15,10 @@ export const TEXTS = {
   sections: {
     detailsTitle: "Podrobnosti",
     detailsSubtitle:
-      "Vesela bova, če se nama pridružiš, da lahko najin dan praznujeva še s tabo!",
+      "Vse, kar moraš vedeti o najinem dnevu - Lokacija, čas in še več.",
     giftsTitle: "Seznam daril",
     giftsSubtitle:
-      "Ko izbereš darilo, se prečrta. Odznačiti ga lahko samo ista naprava, ki ga je označila.",
+      "Najbolj bova vesela finančne pomoči ob začetku najine skupne poti. Če pa bi nama radi kaj podarili, pa ne veste kaj, si lahko pomagate s spodnjim seznamom. Ko izbereš darilo, se prečrta. Odznačiti ga lahko samo ista naprava, ki ga je označila.",
     rsvpTitle: "Prosim sporoči",
     rsvpSubtitle: "Sporoči svojo udeležbo do 20. 5. 2026",
     rsvpThankYouTitle: "Hvala!",
