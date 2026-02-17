@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Hand, ArrowLeftRight } from "lucide-react";
+import { ArrowLeftRight, Hand } from "lucide-react";
 
 type Photo = { src: string; alt: string };
 
@@ -105,7 +105,6 @@ const GallerySection = () => {
           onMouseEnter={() => (isHovering.current = true)}
           onMouseLeave={() => (isHovering.current = false)}
         >
-          {/* MAIN SLIDE */}
           <div className="card-elegant rounded-sm overflow-hidden shadow-lg">
             <div className="relative aspect-[16/9] md:aspect-[21/9] bg-black/5 group">
               <AnimatePresence initial={false} custom={direction}>
@@ -163,7 +162,7 @@ const GallerySection = () => {
                 </motion.div>
               )}
 
-              {/* Swipe (mobile + desktop trackpad) */}
+              {/* Swipe layer */}
               {photos.length > 1 && (
                 <motion.div
                   className="absolute inset-0 z-10"
@@ -193,62 +192,6 @@ const GallerySection = () => {
               </div>
             </div>
           </div>
-
-          {/* DOTS */}
-          {photos.length > 1 && (
-            <div className="flex justify-center gap-2 mt-6">
-              {photos.map((p, i) => (
-                <button
-                  key={p.src}
-                  onClick={() => goTo(i)}
-                  aria-label={`Pojdi na sliko ${i + 1}`}
-                  className={[
-                    "h-2.5 rounded-full transition-all",
-                    i === index ? "w-8 bg-foreground/70" : "w-2.5 bg-foreground/25",
-                  ].join(" ")}
-                />
-              ))}
-            </div>
-          )}
-
-          {/* THUMBNAILS */}
-          {photos.length > 1 && (
-            <div className="mt-8 grid grid-cols-3 sm:grid-cols-5 gap-3">
-              {photos.map((p, i) => (
-                <button
-                  key={p.src}
-                  onClick={() => goTo(i)}
-                  className={[
-                    "overflow-hidden rounded-sm border transition-all",
-                    i === index
-                      ? "border-foreground/50"
-                      : "border-foreground/15 hover:border-foreground/30",
-                  ].join(" ")}
-                  aria-label={`Odpri sliko ${i + 1}`}
-                >
-                  <div className="relative h-20 group">
-                    <img
-                      src={p.src}
-                      alt={p.alt}
-                      className="w-full h-20 object-cover"
-                      loading="lazy"
-                      draggable={false}
-                    />
-                    {/* hover full thumbnail */}
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none">
-                      <div className="absolute inset-0 bg-black/55" />
-                      <img
-                        src={p.src}
-                        alt={p.alt}
-                        className="absolute inset-0 w-full h-full object-contain p-2"
-                        draggable={false}
-                      />
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
         </div>
       </div>
     </section>
