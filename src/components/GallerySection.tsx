@@ -1,3 +1,4 @@
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeftRight, Hand } from "lucide-react";
@@ -27,32 +28,35 @@ const GallerySection = () => {
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState<1 | -1>(1);
 
-  // Swipe hint (mobile)
-  const [showSwipeHint, setShowSwipeHint] = useState(true);
+  // Hint (mobile + desktop)
+  const [showHint, setShowHint] = useState(true);
 
   const AUTOPLAY = true;
   const AUTOPLAY_MS = 6500;
   const isHovering = useRef(false);
 
+  const hideHint = () => setShowHint(false);
+
   const goTo = (i: number) => {
     const next = clampIndex(i, photos.length);
     setDirection(next > index ? 1 : -1);
     setIndex(next);
-    setShowSwipeHint(false);
+    hideHint();
   };
 
   const goPrev = () => {
     setDirection(-1);
     setIndex((i) => clampIndex(i - 1, photos.length));
-    setShowSwipeHint(false);
+    hideHint();
   };
 
   const goNext = () => {
     setDirection(1);
     setIndex((i) => clampIndex(i + 1, photos.length));
-    setShowSwipeHint(false);
+    hideHint();
   };
 
+  // Autoplay (pausa na hover)
   useEffect(() => {
     if (!AUTOPLAY || photos.length <= 1) return;
     const id = window.setInterval(() => {
@@ -63,19 +67,26 @@ const GallerySection = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [photos.length, AUTOPLAY]);
 
+  // Keyboard nav
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft") goPrev();
-      if (e.key === "ArrowRight") goNext();
+      if (e.key === "ArrowLeft") {
+        hideHint();
+        goPrev();
+      }
+      if (e.key === "ArrowRight") {
+        hideHint();
+        goNext();
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [index, photos.length]);
 
-  // Auto-hide swipe hint after a few seconds
+  // Auto-hide hint after a few seconds
   useEffect(() => {
-    const t = window.setTimeout(() => setShowSwipeHint(false), 6000);
+    const t = window.setTimeout(() => setShowHint(false), 6000);
     return () => window.clearTimeout(t);
   }, []);
 
@@ -106,7 +117,11 @@ const GallerySection = () => {
           onMouseLeave={() => (isHovering.current = false)}
         >
           <div className="card-elegant rounded-sm overflow-hidden shadow-lg">
-            <div className="relative aspect-[16/9] md:aspect-[21/9] bg-black/5 group">
+            <div
+              className="relative aspect-[16/9] md:aspect-[21/9] bg-black/5 group"
+              onWheel={hideHint}
+              onPointerDown={hideHint}
+            >
               <AnimatePresence initial={false} custom={direction}>
                 <motion.img
                   key={current?.src}
@@ -136,8 +151,8 @@ const GallerySection = () => {
               {/* GRADIENT */}
               <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/35 via-black/0 to-black/0" />
 
-              {/* Swipe hint (mobile only) */}
-              {photos.length > 1 && showSwipeHint && (
+              {/* Hint (mobile) */}
+              {photos.length > 1 && showHint && (
                 <motion.div
                   className="md:hidden absolute bottom-4 left-1/2 -translate-x-1/2 z-20"
                   initial={{ opacity: 0, y: 8 }}
@@ -162,17 +177,44 @@ const GallerySection = () => {
                 </motion.div>
               )}
 
-              {/* Swipe layer */}
+              {/* Hint (desktop) */}
+              {photos.length > 1 && showHint && (
+                <motion.div
+                  className="hidden md:flex absolute bottom-4 left-1/2 -translate-x-1/2 z-20"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 8 }}
+                >
+                  <div className="flex items-center gap-3 bg-black/40 backdrop-blur-sm text-white text-sm px-4 py-2 rounded-full shadow">
+                    <span className="opacity-90">Scroll / Drag</span>
+                    <motion.span
+                      className="inline-flex items-center"
+                      animate={{ x: [0, 10, 0, -10, 0] }}
+                      transition={{
+                        duration: 1.6,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
+                    >
+                      <ArrowLeftRight className="w-4 h-4 opacity-90" />
+                    </motion.span>
+                    <span className="text-xs opacity-80 border border-white/25 rounded px-2 py-0.5">
+                      ← →
+                    </span>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Swipe / Drag layer */}
               {photos.length > 1 && (
                 <motion.div
                   className="absolute inset-0 z-10"
                   drag="x"
                   dragConstraints={{ left: 0, right: 0 }}
                   dragElastic={0.12}
-                  onPointerDown={() => setShowSwipeHint(false)}
-                  onDragStart={() => setShowSwipeHint(false)}
+                  onDragStart={hideHint}
                   onDragEnd={(_, info) => {
-                    setShowSwipeHint(false);
+                    hideHint();
                     const threshold = 60;
                     if (info.offset.x > threshold) goPrev();
                     if (info.offset.x < -threshold) goNext();
