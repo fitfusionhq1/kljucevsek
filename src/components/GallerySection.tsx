@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Hand, ArrowLeftRight } from "lucide-react";
 
 type Photo = { src: string; alt: string };
 
@@ -28,6 +27,9 @@ const GallerySection = () => {
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState<1 | -1>(1);
 
+  // Swipe hint (mobile)
+  const [showSwipeHint, setShowSwipeHint] = useState(true);
+
   const AUTOPLAY = true;
   const AUTOPLAY_MS = 6500;
   const isHovering = useRef(false);
@@ -36,16 +38,19 @@ const GallerySection = () => {
     const next = clampIndex(i, photos.length);
     setDirection(next > index ? 1 : -1);
     setIndex(next);
+    setShowSwipeHint(false);
   };
 
   const goPrev = () => {
     setDirection(-1);
     setIndex((i) => clampIndex(i - 1, photos.length));
+    setShowSwipeHint(false);
   };
 
   const goNext = () => {
     setDirection(1);
     setIndex((i) => clampIndex(i + 1, photos.length));
+    setShowSwipeHint(false);
   };
 
   useEffect(() => {
@@ -67,6 +72,12 @@ const GallerySection = () => {
     return () => window.removeEventListener("keydown", onKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [index, photos.length]);
+
+  // Auto-hide swipe hint after a few seconds
+  useEffect(() => {
+    const t = window.setTimeout(() => setShowSwipeHint(false), 6000);
+    return () => window.clearTimeout(t);
+  }, []);
 
   const current = photos[index];
 
@@ -126,43 +137,50 @@ const GallerySection = () => {
               {/* GRADIENT */}
               <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/35 via-black/0 to-black/0" />
 
-              {/* ARROWS */}
-              {photos.length > 1 && (
-                <>
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full w-11 h-11 p-0 opacity-90"
-                    onClick={goPrev}
-                    aria-label="Prejšnja slika"
-                  >
-                    <ChevronLeft className="w-5 h-5" />
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full w-11 h-11 p-0 opacity-90"
-                    onClick={goNext}
-                    aria-label="Naslednja slika"
-                  >
-                    <ChevronRight className="w-5 h-5" />
-                  </Button>
-                </>
+              {/* Swipe hint (mobile only) */}
+              {photos.length > 1 && showSwipeHint && (
+                <motion.div
+                  className="md:hidden absolute bottom-4 left-1/2 -translate-x-1/2 z-20"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 8 }}
+                >
+                  <div className="flex items-center gap-2 bg-black/45 backdrop-blur-sm text-white text-sm px-4 py-2 rounded-full shadow">
+                    <Hand className="w-4 h-4 opacity-90" />
+                    <span>Podrsaj</span>
+                    <motion.span
+                      className="inline-flex items-center"
+                      animate={{ x: [0, 10, 0, -10, 0] }}
+                      transition={{
+                        duration: 1.6,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
+                    >
+                      <ArrowLeftRight className="w-4 h-4 opacity-90" />
+                    </motion.span>
+                  </div>
+                </motion.div>
               )}
 
-              {/* Swipe (mobile) */}
-              <motion.div
-                className="absolute inset-0"
-                drag="x"
-                dragConstraints={{ left: 0, right: 0 }}
-                dragElastic={0.12}
-                onDragEnd={(_, info) => {
-                  const threshold = 60;
-                  if (info.offset.x > threshold) goPrev();
-                  if (info.offset.x < -threshold) goNext();
-                }}
-                style={{ touchAction: "pan-y" }}
-              />
+              {/* Swipe (mobile + desktop trackpad) */}
+              {photos.length > 1 && (
+                <motion.div
+                  className="absolute inset-0 z-10"
+                  drag="x"
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={0.12}
+                  onPointerDown={() => setShowSwipeHint(false)}
+                  onDragStart={() => setShowSwipeHint(false)}
+                  onDragEnd={(_, info) => {
+                    setShowSwipeHint(false);
+                    const threshold = 60;
+                    if (info.offset.x > threshold) goPrev();
+                    if (info.offset.x < -threshold) goNext();
+                  }}
+                  style={{ touchAction: "pan-y" }}
+                />
+              )}
             </div>
 
             {/* CAPTION / COUNTER */}
