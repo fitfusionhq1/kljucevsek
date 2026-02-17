@@ -48,62 +48,65 @@ const HeroSection = () => {
           initial={{ opacity: 0, scale: 0.97 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.5, duration: 0.8 }}
-          className="flex flex-col items-center justify-center gap-6 md:gap-12"
+          className="flex flex-col items-center justify-center gap-6 md:grid md:grid-cols-3 md:gap-12"
         >
-          {/* Center Hero Photo FIRST on mobile */}
+          {/* Katarina (LEFT) */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.6, duration: 0.8 }}
+            className="flex flex-col items-center order-1 md:order-none"
+          >
+            <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-sage/30 shadow-lg mb-3 md:mb-4">
+              <img
+                src={katarinaPhoto}
+                alt="Katarina"
+                className="w-full h-full object-cover object-top"
+              />
+            </div>
+            <h1 className="heading-script text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-foreground">
+              Katarina
+            </h1>
+          </motion.div>
+
+          {/* Center Hero Photo (MIDDLE) */}
           <motion.div
             initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.6, duration: 0.8 }}
-            className="relative"
+            transition={{ delay: 0.7, duration: 0.8 }}
+            className="relative order-2 md:order-none flex justify-center"
           >
             <div className="w-44 h-44 sm:w-52 sm:h-52 md:w-56 md:h-56 lg:w-64 lg:h-64 rounded-full overflow-hidden border-4 border-gold/40 shadow-2xl">
-              <img src={coupleHero} alt="Katarina in Vid" className="w-full h-full object-cover" />
+              <img
+                src={coupleHero}
+                alt="Katarina in Vid"
+                className="w-full h-full object-cover"
+              />
             </div>
             <div className="absolute inset-0 rounded-full ring-2 ring-gold/20 ring-offset-4 ring-offset-background" />
           </motion.div>
 
-          {/* Names row on mobile, 2 columns; 2 side columns on desktop */}
-          <div className="w-full max-w-xl grid grid-cols-2 md:grid-cols-3 items-start gap-4 md:gap-12">
-            {/* Vid */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.7, duration: 0.8 }}
-              className="flex flex-col items-center md:items-center md:col-start-1"
-            >
-              <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-sage/30 shadow-lg mb-3 md:mb-4">
-                <img src={vidPhoto} alt="Vid" className="w-full h-full object-cover object-top" />
-              </div>
-              <h1 className="heading-script text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-foreground">
-                Vid
-              </h1>
-            </motion.div>
-
-            {/* Spacer column only on desktop to keep layout centered */}
-            <div className="hidden md:block" />
-
-            {/* Katarina */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.7, duration: 0.8 }}
-              className="flex flex-col items-center md:items-center md:col-start-3"
-            >
-              <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-sage/30 shadow-lg mb-3 md:mb-4">
-                <img
-                  src={katarinaPhoto}
-                  alt="Katarina"
-                  className="w-full h-full object-cover object-top"
-                />
-              </div>
-              <h1 className="heading-script text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-foreground">
-                Katarina
-              </h1>
-            </motion.div>
-          </div>
+          {/* Vid (RIGHT) */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.6, duration: 0.8 }}
+            className="flex flex-col items-center order-3 md:order-none"
+          >
+            <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-sage/30 shadow-lg mb-3 md:mb-4">
+              <img
+                src={vidPhoto}
+                alt="Vid"
+                className="w-full h-full object-cover object-top"
+              />
+            </div>
+            <h1 className="heading-script text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-foreground">
+              Vid
+            </h1>
+          </motion.div>
         </motion.div>
 
+        {/* Invite lines */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -115,8 +118,9 @@ const HeroSection = () => {
           <p className="text-body text-muted-foreground mt-1">{TEXTS.hero.inviteLine2}</p>
         </motion.div>
 
+        {/* Date line */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1, duration: 0.8 }}
           className="mt-8 sm:mt-12 text-center"
@@ -155,7 +159,7 @@ const HeroSection = () => {
         )}
       </div>
 
-      {/* Scroll indicator (hide on very small screens to reduce clutter) */}
+      {/* Scroll indicator (hide on very small screens) */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
