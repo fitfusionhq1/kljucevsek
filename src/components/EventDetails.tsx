@@ -18,7 +18,7 @@ const ALL_EVENTS: EventCard[] = [
   {
     key: "cerkvena",
     title: "Cerkvena poroka",
-    time: "14:00",
+    time: "13:30",
     place: "Cerkev Marije Pomočnice na Rakovniku",
     address: "Rakovniška ulica 6",
   },
@@ -32,7 +32,7 @@ const ALL_EVENTS: EventCard[] = [
   {
     key: "ohcet",
     title: "Ohcet",
-    time: "18.30",
+    time: "19.00",
     place: "Gostišče Rupnik",
     address: "Sveti Andrej 38, Škofja Loka, Slovenia",
     // če želiš šumnike povsod: "Škofja Loka"
