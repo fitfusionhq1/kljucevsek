@@ -106,11 +106,11 @@ const GallerySection = () => {
             Galerija
           </h2>
           <p className="text-body text-muted-foreground">
-            Nekaj utrinkov in najinih trenutkov.
+            Nekaj utrinkov in najinih skupnih trenutkov.
           </p>
           <div className="divider-ornament mt-6" />
         </motion.div>
-
+ 
         <div
           className="relative"
           onMouseEnter={() => (isHovering.current = true)}

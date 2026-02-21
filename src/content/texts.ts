@@ -21,14 +21,14 @@ export const TEXTS = {
       "Vse, kar moraš vedeti o najinem dnevu - Lokacija, čas in še več.",
     giftsTitle: "Seznam daril",
     giftsSubtitle:{
-      giftsSubtitleLine1: "Ob začetkuj najine skupne poti bova vesela finančne pomoči.",
+      giftsSubtitleLine1: "Ob začetku najine skupne poti bova vesela finančne pomoči.",
       giftsSubtitleLine2: "",
       giftsSubtitleLine3: "Če pa bi nama radi kaj podarili, pa ne veste kaj, si lahko pomagate s spodnjim seznamom.",
       giftsSubtitleLine4: "",
-      giftsSubtitleLine5: "Ko izbereš darilo, se prečrta. Odznačiti ga lahko samo ista naprava, ki ga je označila.",
+      giftsSubtitleLine5: "Ko izbereš darilo, se prečrta. Odznači ga lahko samo ista naprava, ki ga je označila.",
     },
     rsvpTitle: "Prosim sporoči",
-    rsvpSubtitle: "Sporoči svojo udeležbo do 20. 5. 2026",
+    rsvpSubtitle: "Sporoči svojo udeležbo do 20. 5. 2026, drugače bova mislila, da te ne bo.",
     rsvpThankYouTitle: "Hvala!",
     rsvpThankYouText:
       "Tvoj odgovor sva prejela. Komaj čakava, da praznujeva skupaj!",
@@ -55,7 +55,7 @@ export const TEXTS = {
     no: "Ne pridem",
     howMany: "Koliko vas pride?",
     churchGame:
-      "Koliko časa misliš, da bo trajala cerkvena poroka? (v minutah)",
+      "Koliko časa misliš, da bo trajala cerkvena poroka? (Oddaj svojo v minutah stavo, samo za zabavo)",
     notes: "Opombe (neobvezno)",
   },
 },

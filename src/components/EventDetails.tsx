@@ -33,7 +33,7 @@ const ALL_EVENTS: EventCard[] = [
     key: "ohcet",
     title: "Ohcet",
     time: "19.00",
-    place: "Gostišče Rupnik",
+    place: "Gostišče Rupar",
     address: "Sveti Andrej 38, Škofja Loka, Slovenia",
     // če želiš šumnike povsod: "Škofja Loka"
   },
