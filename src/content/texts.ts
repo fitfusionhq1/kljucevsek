@@ -55,7 +55,7 @@ export const TEXTS = {
     no: "Ne pridem",
     howMany: "Koliko vas pride?",
     churchGame:
-      "Koliko časa misliš, da bo trajala cerkvena poroka? (Oddaj svojo v minutah stavo, samo za zabavo)",
+      "Koliko časa misliš, da bo trajala cerkvena poroka? (Oddaj svojo stavo v minutah, samo za zabavo)",
     notes: "Opombe (neobvezno)",
   },
 },
